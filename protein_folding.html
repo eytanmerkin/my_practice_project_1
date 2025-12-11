@@ -1,0 +1,805 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interactive Protein Folding Visualization</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&family=Outfit:wght@300;400;600;700&display=swap');
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Outfit', sans-serif;
+            background: #0a0a0f;
+            min-height: 100vh;
+            color: #e0e0e0;
+            overflow-x: hidden;
+        }
+
+        .app-container {
+            display: grid;
+            grid-template-columns: 1fr 320px;
+            min-height: 100vh;
+        }
+
+        #canvas-container {
+            position: relative;
+            background: radial-gradient(ellipse at center, #1a1a2e 0%, #0a0a0f 100%);
+            cursor: grab;
+        }
+
+        #canvas-container:active {
+            cursor: grabbing;
+        }
+
+        .sidebar {
+            background: linear-gradient(180deg, #12121a 0%, #0d0d14 100%);
+            border-left: 1px solid rgba(255,255,255,0.05);
+            padding: 24px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid rgba(255,255,255,0.08);
+        }
+
+        .logo-icon {
+            font-size: 2em;
+        }
+
+        .logo h1 {
+            font-size: 1.3em;
+            font-weight: 600;
+            background: linear-gradient(135deg, #6ee7b7 0%, #3b82f6 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .control-section {
+            background: rgba(255,255,255,0.03);
+            border-radius: 12px;
+            padding: 16px;
+            border: 1px solid rgba(255,255,255,0.05);
+        }
+
+        .control-section h3 {
+            font-size: 0.75em;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            color: #888;
+            margin-bottom: 12px;
+            font-weight: 600;
+        }
+
+        .slider-group {
+            margin-bottom: 16px;
+        }
+
+        .slider-group:last-child {
+            margin-bottom: 0;
+        }
+
+        .slider-label {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+            font-size: 0.9em;
+        }
+
+        .slider-value {
+            font-family: 'JetBrains Mono', monospace;
+            color: #6ee7b7;
+            font-weight: 600;
+        }
+
+        input[type="range"] {
+            width: 100%;
+            height: 4px;
+            border-radius: 2px;
+            background: rgba(255,255,255,0.1);
+            outline: none;
+            -webkit-appearance: none;
+            appearance: none;
+        }
+
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            background: #6ee7b7;
+            cursor: pointer;
+            box-shadow: 0 0 10px rgba(110, 231, 183, 0.5);
+            transition: transform 0.2s;
+        }
+
+        input[type="range"]::-webkit-slider-thumb:hover {
+            transform: scale(1.2);
+        }
+
+        .btn-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+        }
+
+        button {
+            padding: 10px 16px;
+            border: none;
+            border-radius: 8px;
+            background: rgba(255,255,255,0.08);
+            color: #e0e0e0;
+            font-family: 'Outfit', sans-serif;
+            font-size: 0.85em;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            border: 1px solid rgba(255,255,255,0.05);
+        }
+
+        button:hover {
+            background: rgba(255,255,255,0.12);
+            border-color: rgba(110, 231, 183, 0.3);
+        }
+
+        button.active {
+            background: rgba(110, 231, 183, 0.15);
+            border-color: rgba(110, 231, 183, 0.4);
+            color: #6ee7b7;
+        }
+
+        button.primary {
+            background: linear-gradient(135deg, #6ee7b7 0%, #3b82f6 100%);
+            color: #0a0a0f;
+            font-weight: 600;
+            grid-column: span 2;
+        }
+
+        button.primary:hover {
+            opacity: 0.9;
+            transform: translateY(-1px);
+        }
+
+        .structure-toggles {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .toggle-btn {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            width: 100%;
+            text-align: left;
+            padding: 10px 12px;
+        }
+
+        .toggle-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            flex-shrink: 0;
+        }
+
+        .toggle-btn.helix .toggle-dot { background: #ff6b6b; }
+        .toggle-btn.sheet .toggle-dot { background: #4ecdc4; }
+        .toggle-btn.coil .toggle-dot { background: #ffd93d; }
+
+        .toggle-btn.inactive {
+            opacity: 0.4;
+        }
+
+        .stats {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.8em;
+            color: #666;
+            padding: 12px;
+            background: rgba(0,0,0,0.3);
+            border-radius: 8px;
+        }
+
+        .stats-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 4px 0;
+        }
+
+        .stats-value {
+            color: #6ee7b7;
+        }
+
+        .overlay-info {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            background: rgba(0,0,0,0.6);
+            padding: 12px 16px;
+            border-radius: 8px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.8em;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .legend {
+            display: flex;
+            gap: 16px;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .legend-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+        }
+
+        .legend-dot.helix { background: #ff6b6b; }
+        .legend-dot.sheet { background: #4ecdc4; }
+        .legend-dot.coil { background: #ffd93d; }
+
+        @media (max-width: 900px) {
+            .app-container {
+                grid-template-columns: 1fr;
+                grid-template-rows: 60vh auto;
+            }
+            
+            .sidebar {
+                border-left: none;
+                border-top: 1px solid rgba(255,255,255,0.05);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <div id="canvas-container">
+            <div class="overlay-info">
+                <div class="legend">
+                    <div class="legend-item"><div class="legend-dot helix"></div> α-Helix</div>
+                    <div class="legend-item"><div class="legend-dot sheet"></div> β-Sheet</div>
+                    <div class="legend-item"><div class="legend-dot coil"></div> Coil</div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="sidebar">
+            <div class="logo">
+                <span class="logo-icon">🧬</span>
+                <h1>Protein Folding</h1>
+            </div>
+            
+            <div class="control-section">
+                <h3>Folding Animation</h3>
+                <div class="slider-group">
+                    <div class="slider-label">
+                        <span>Progress</span>
+                        <span class="slider-value" id="folding-value">0%</span>
+                    </div>
+                    <input type="range" id="folding-slider" min="0" max="100" value="0">
+                </div>
+                <div class="slider-group">
+                    <div class="slider-label">
+                        <span>Speed</span>
+                        <span class="slider-value" id="speed-value">1.0x</span>
+                    </div>
+                    <input type="range" id="speed-slider" min="1" max="50" value="10">
+                </div>
+                <div class="btn-row">
+                    <button id="play-btn" class="primary">▶ Play</button>
+                </div>
+                <div class="btn-row" style="margin-top: 8px;">
+                    <button id="reset-btn">↻ Reset</button>
+                    <button id="random-btn">🎲 New</button>
+                </div>
+            </div>
+            
+            <div class="control-section">
+                <h3>Secondary Structure</h3>
+                <div class="structure-toggles">
+                    <button class="toggle-btn helix active" id="toggle-helix">
+                        <span class="toggle-dot"></span>
+                        <span>α-Helix</span>
+                    </button>
+                    <button class="toggle-btn sheet active" id="toggle-sheet">
+                        <span class="toggle-dot"></span>
+                        <span>β-Sheet</span>
+                    </button>
+                    <button class="toggle-btn coil active" id="toggle-coil">
+                        <span class="toggle-dot"></span>
+                        <span>Random Coil</span>
+                    </button>
+                </div>
+            </div>
+            
+            <div class="control-section">
+                <h3>View Options</h3>
+                <div class="btn-row">
+                    <button id="wireframe-btn">Wireframe</button>
+                    <button id="center-btn">Center View</button>
+                </div>
+                <div class="slider-group" style="margin-top: 12px;">
+                    <div class="slider-label">
+                        <span>Atom Size</span>
+                        <span class="slider-value" id="size-value">1.0</span>
+                    </div>
+                    <input type="range" id="size-slider" min="5" max="20" value="10">
+                </div>
+            </div>
+            
+            <div class="control-section">
+                <h3>Protein Stats</h3>
+                <div class="stats">
+                    <div class="stats-row">
+                        <span>Residues:</span>
+                        <span class="stats-value" id="stat-residues">0</span>
+                    </div>
+                    <div class="stats-row">
+                        <span>Helices:</span>
+                        <span class="stats-value" id="stat-helix">0</span>
+                    </div>
+                    <div class="stats-row">
+                        <span>Sheets:</span>
+                        <span class="stats-value" id="stat-sheet">0</span>
+                    </div>
+                    <div class="stats-row">
+                        <span>Coils:</span>
+                        <span class="stats-value" id="stat-coil">0</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script>
+    (function() {
+        // =====================
+        // THREE.JS SCENE SETUP
+        // =====================
+        const container = document.getElementById('canvas-container');
+        const scene = new THREE.Scene();
+        
+        const camera = new THREE.PerspectiveCamera(60, container.clientWidth / container.clientHeight, 0.1, 1000);
+        camera.position.set(0, 0, 80);
+        
+        const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+        renderer.setSize(container.clientWidth, container.clientHeight);
+        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+        container.appendChild(renderer.domElement);
+        
+        // Lighting
+        const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
+        scene.add(ambientLight);
+        
+        const light1 = new THREE.DirectionalLight(0xffffff, 0.8);
+        light1.position.set(50, 50, 50);
+        scene.add(light1);
+        
+        const light2 = new THREE.DirectionalLight(0x6ee7b7, 0.3);
+        light2.position.set(-50, -20, -50);
+        scene.add(light2);
+        
+        // =====================
+        // ORBIT CONTROLS
+        // =====================
+        let isDragging = false;
+        let previousMouse = { x: 0, y: 0 };
+        let spherical = { theta: 0, phi: Math.PI / 2, radius: 80 };
+        let targetPosition = new THREE.Vector3(0, 0, 0);
+        
+        function updateCameraPosition() {
+            camera.position.x = targetPosition.x + spherical.radius * Math.sin(spherical.phi) * Math.cos(spherical.theta);
+            camera.position.y = targetPosition.y + spherical.radius * Math.cos(spherical.phi);
+            camera.position.z = targetPosition.z + spherical.radius * Math.sin(spherical.phi) * Math.sin(spherical.theta);
+            camera.lookAt(targetPosition);
+        }
+        
+        renderer.domElement.addEventListener('mousedown', (e) => {
+            if (e.button === 0) {
+                isDragging = true;
+                previousMouse = { x: e.clientX, y: e.clientY };
+            }
+        });
+        
+        renderer.domElement.addEventListener('mousemove', (e) => {
+            if (!isDragging) return;
+            
+            const deltaX = e.clientX - previousMouse.x;
+            const deltaY = e.clientY - previousMouse.y;
+            
+            spherical.theta -= deltaX * 0.01;
+            spherical.phi += deltaY * 0.01;
+            spherical.phi = Math.max(0.1, Math.min(Math.PI - 0.1, spherical.phi));
+            
+            updateCameraPosition();
+            previousMouse = { x: e.clientX, y: e.clientY };
+        });
+        
+        window.addEventListener('mouseup', () => { isDragging = false; });
+        
+        renderer.domElement.addEventListener('wheel', (e) => {
+            e.preventDefault();
+            spherical.radius += e.deltaY * 0.1;
+            spherical.radius = Math.max(20, Math.min(200, spherical.radius));
+            updateCameraPosition();
+        });
+        
+        renderer.domElement.addEventListener('contextmenu', (e) => e.preventDefault());
+        
+        // =====================
+        // PROTEIN DATA MODEL
+        // =====================
+        let proteinData = [];
+        let atomMeshes = [];
+        let bondMeshes = [];
+        
+        // State
+        let foldingProgress = 0;
+        let isPlaying = false;
+        let animationSpeed = 1;
+        let atomSize = 1;
+        let showHelix = true;
+        let showSheet = true;
+        let showCoil = true;
+        let wireframeMode = false;
+        
+        // Colors
+        const colors = {
+            helix: new THREE.Color(0xff6b6b),
+            sheet: new THREE.Color(0x4ecdc4),
+            coil: new THREE.Color(0xffd93d)
+        };
+        
+        // =====================
+        // PROTEIN GENERATION
+        // =====================
+        function generateProtein(residueCount = 50) {
+            const data = [];
+            
+            // Generate secondary structure regions
+            const regions = [];
+            let pos = 0;
+            while (pos < residueCount) {
+                const type = Math.random() < 0.35 ? 'helix' : (Math.random() < 0.5 ? 'sheet' : 'coil');
+                const length = type === 'helix' ? Math.floor(8 + Math.random() * 12) :
+                              type === 'sheet' ? Math.floor(5 + Math.random() * 8) :
+                              Math.floor(3 + Math.random() * 6);
+                regions.push({ type, start: pos, end: Math.min(pos + length, residueCount) });
+                pos += length;
+            }
+            
+            // Generate 3D positions for folded state
+            let currentPos = new THREE.Vector3(0, 0, 0);
+            let direction = new THREE.Vector3(1, 0, 0);
+            let helixPhase = 0;
+            let sheetWave = 0;
+            
+            for (let i = 0; i < residueCount; i++) {
+                // Find which region this residue belongs to
+                const region = regions.find(r => i >= r.start && i < r.end);
+                const type = region ? region.type : 'coil';
+                const regionIndex = i - (region ? region.start : 0);
+                
+                let foldedPos;
+                
+                if (type === 'helix') {
+                    // Alpha helix: spiral structure
+                    const angle = helixPhase + regionIndex * (2 * Math.PI / 3.6);
+                    const radius = 2.3;
+                    const rise = 1.5; // Rise per residue
+                    
+                    if (regionIndex === 0) {
+                        // Start helix from current position
+                        helixPhase = Math.random() * Math.PI * 2;
+                    }
+                    
+                    foldedPos = new THREE.Vector3(
+                        currentPos.x + radius * Math.cos(angle),
+                        currentPos.y + radius * Math.sin(angle),
+                        currentPos.z + regionIndex * rise
+                    );
+                    
+                    if (regionIndex === (region.end - region.start - 1)) {
+                        // Update currentPos for next region
+                        currentPos.copy(foldedPos);
+                        direction.set(0, 0, 1).applyAxisAngle(new THREE.Vector3(0, 1, 0), Math.random() * Math.PI);
+                    }
+                } else if (type === 'sheet') {
+                    // Beta sheet: pleated structure
+                    const pleat = Math.sin(sheetWave + regionIndex * 1.2) * 0.8;
+                    
+                    if (regionIndex === 0) {
+                        sheetWave = Math.random() * Math.PI * 2;
+                        direction.applyAxisAngle(new THREE.Vector3(0, 1, 0), (Math.random() - 0.5) * Math.PI);
+                    }
+                    
+                    const offset = direction.clone().multiplyScalar(regionIndex * 3.4);
+                    foldedPos = new THREE.Vector3(
+                        currentPos.x + offset.x,
+                        currentPos.y + pleat,
+                        currentPos.z + offset.z
+                    );
+                    
+                    if (regionIndex === (region.end - region.start - 1)) {
+                        currentPos.copy(foldedPos);
+                        direction.applyAxisAngle(new THREE.Vector3(0, 1, 0), (Math.random() - 0.5) * Math.PI * 0.5);
+                    }
+                } else {
+                    // Random coil: flexible
+                    direction.applyAxisAngle(
+                        new THREE.Vector3(Math.random() - 0.5, Math.random() - 0.5, Math.random() - 0.5).normalize(),
+                        (Math.random() - 0.5) * 1.2
+                    );
+                    currentPos.add(direction.clone().multiplyScalar(3.8));
+                    foldedPos = currentPos.clone();
+                }
+                
+                // Unfolded position: simple extended chain
+                const unfoldedPos = new THREE.Vector3(i * 2 - residueCount, 0, 0);
+                
+                data.push({
+                    index: i,
+                    type: type,
+                    foldedPos: foldedPos.clone(),
+                    unfoldedPos: unfoldedPos.clone()
+                });
+            }
+            
+            // Center the folded structure
+            const center = new THREE.Vector3();
+            data.forEach(d => center.add(d.foldedPos));
+            center.divideScalar(data.length);
+            data.forEach(d => d.foldedPos.sub(center));
+            
+            return data;
+        }
+        
+        // =====================
+        // VISUALIZATION
+        // =====================
+        function clearProtein() {
+            atomMeshes.forEach(mesh => {
+                scene.remove(mesh);
+                mesh.geometry.dispose();
+                mesh.material.dispose();
+            });
+            bondMeshes.forEach(mesh => {
+                scene.remove(mesh);
+                mesh.geometry.dispose();
+                mesh.material.dispose();
+            });
+            atomMeshes = [];
+            bondMeshes = [];
+        }
+        
+        function createProteinMeshes() {
+            clearProtein();
+            
+            // Create atom spheres
+            proteinData.forEach((residue, i) => {
+                const geometry = new THREE.SphereGeometry(1, 16, 16);
+                const material = new THREE.MeshPhongMaterial({
+                    color: colors[residue.type],
+                    emissive: colors[residue.type].clone().multiplyScalar(0.2),
+                    wireframe: wireframeMode
+                });
+                const mesh = new THREE.Mesh(geometry, material);
+                mesh.userData = { type: residue.type, index: i };
+                atomMeshes.push(mesh);
+                scene.add(mesh);
+            });
+            
+            // Create bonds (cylinders)
+            for (let i = 0; i < proteinData.length - 1; i++) {
+                const geometry = new THREE.CylinderGeometry(0.3, 0.3, 1, 8);
+                const material = new THREE.MeshPhongMaterial({
+                    color: 0xffffff,
+                    opacity: 0.7,
+                    transparent: true,
+                    wireframe: wireframeMode
+                });
+                const mesh = new THREE.Mesh(geometry, material);
+                mesh.userData = { index: i };
+                bondMeshes.push(mesh);
+                scene.add(mesh);
+            }
+            
+            updateProteinPositions();
+        }
+        
+        function updateProteinPositions() {
+            const progress = foldingProgress;
+            
+            proteinData.forEach((residue, i) => {
+                const mesh = atomMeshes[i];
+                if (!mesh) return;
+                
+                // Interpolate position
+                const pos = residue.unfoldedPos.clone().lerp(residue.foldedPos, progress);
+                mesh.position.copy(pos);
+                
+                // Update scale
+                mesh.scale.setScalar(atomSize);
+                
+                // Visibility based on type toggles
+                const visible = (residue.type === 'helix' && showHelix) ||
+                               (residue.type === 'sheet' && showSheet) ||
+                               (residue.type === 'coil' && showCoil);
+                mesh.visible = visible;
+            });
+            
+            // Update bonds
+            bondMeshes.forEach((mesh, i) => {
+                if (i >= proteinData.length - 1) return;
+                
+                const pos1 = atomMeshes[i].position;
+                const pos2 = atomMeshes[i + 1].position;
+                
+                const mid = pos1.clone().add(pos2).multiplyScalar(0.5);
+                const length = pos1.distanceTo(pos2);
+                
+                mesh.position.copy(mid);
+                mesh.scale.set(atomSize * 0.3, length, atomSize * 0.3);
+                
+                // Orient cylinder between points
+                const dir = pos2.clone().sub(pos1).normalize();
+                const quaternion = new THREE.Quaternion();
+                quaternion.setFromUnitVectors(new THREE.Vector3(0, 1, 0), dir);
+                mesh.quaternion.copy(quaternion);
+                
+                // Visibility
+                mesh.visible = atomMeshes[i].visible && atomMeshes[i + 1].visible;
+            });
+        }
+        
+        function updateStats() {
+            const counts = { helix: 0, sheet: 0, coil: 0 };
+            proteinData.forEach(r => counts[r.type]++);
+            
+            document.getElementById('stat-residues').textContent = proteinData.length;
+            document.getElementById('stat-helix').textContent = counts.helix;
+            document.getElementById('stat-sheet').textContent = counts.sheet;
+            document.getElementById('stat-coil').textContent = counts.coil;
+        }
+        
+        // =====================
+        // UI EVENT HANDLERS
+        // =====================
+        document.getElementById('folding-slider').addEventListener('input', (e) => {
+            foldingProgress = e.target.value / 100;
+            document.getElementById('folding-value').textContent = Math.round(foldingProgress * 100) + '%';
+            updateProteinPositions();
+        });
+        
+        document.getElementById('speed-slider').addEventListener('input', (e) => {
+            animationSpeed = e.target.value / 10;
+            document.getElementById('speed-value').textContent = animationSpeed.toFixed(1) + 'x';
+        });
+        
+        document.getElementById('size-slider').addEventListener('input', (e) => {
+            atomSize = e.target.value / 10;
+            document.getElementById('size-value').textContent = atomSize.toFixed(1);
+            updateProteinPositions();
+        });
+        
+        document.getElementById('play-btn').addEventListener('click', () => {
+            isPlaying = !isPlaying;
+            document.getElementById('play-btn').textContent = isPlaying ? '⏸ Pause' : '▶ Play';
+        });
+        
+        document.getElementById('reset-btn').addEventListener('click', () => {
+            foldingProgress = 0;
+            isPlaying = false;
+            document.getElementById('folding-slider').value = 0;
+            document.getElementById('folding-value').textContent = '0%';
+            document.getElementById('play-btn').textContent = '▶ Play';
+            updateProteinPositions();
+        });
+        
+        document.getElementById('random-btn').addEventListener('click', () => {
+            proteinData = generateProtein(40 + Math.floor(Math.random() * 40));
+            createProteinMeshes();
+            updateStats();
+        });
+        
+        document.getElementById('wireframe-btn').addEventListener('click', (e) => {
+            wireframeMode = !wireframeMode;
+            e.target.classList.toggle('active', wireframeMode);
+            atomMeshes.forEach(m => m.material.wireframe = wireframeMode);
+            bondMeshes.forEach(m => m.material.wireframe = wireframeMode);
+        });
+        
+        document.getElementById('center-btn').addEventListener('click', () => {
+            spherical = { theta: 0, phi: Math.PI / 2, radius: 80 };
+            targetPosition.set(0, 0, 0);
+            updateCameraPosition();
+        });
+        
+        function setupToggle(id, prop) {
+            document.getElementById(id).addEventListener('click', (e) => {
+                if (prop === 'helix') showHelix = !showHelix;
+                if (prop === 'sheet') showSheet = !showSheet;
+                if (prop === 'coil') showCoil = !showCoil;
+                
+                const isActive = prop === 'helix' ? showHelix : prop === 'sheet' ? showSheet : showCoil;
+                e.currentTarget.classList.toggle('active', isActive);
+                e.currentTarget.classList.toggle('inactive', !isActive);
+                updateProteinPositions();
+            });
+        }
+        
+        setupToggle('toggle-helix', 'helix');
+        setupToggle('toggle-sheet', 'sheet');
+        setupToggle('toggle-coil', 'coil');
+        
+        // =====================
+        // ANIMATION LOOP
+        // =====================
+        let lastTime = 0;
+        
+        function animate(time) {
+            requestAnimationFrame(animate);
+            
+            const delta = (time - lastTime) / 1000;
+            lastTime = time;
+            
+            if (isPlaying) {
+                foldingProgress += delta * animationSpeed * 0.3;
+                if (foldingProgress > 1) {
+                    foldingProgress = 1;
+                    isPlaying = false;
+                    document.getElementById('play-btn').textContent = '▶ Play';
+                }
+                document.getElementById('folding-slider').value = foldingProgress * 100;
+                document.getElementById('folding-value').textContent = Math.round(foldingProgress * 100) + '%';
+                updateProteinPositions();
+            }
+            
+            renderer.render(scene, camera);
+        }
+        
+        // =====================
+        // RESIZE HANDLER
+        // =====================
+        window.addEventListener('resize', () => {
+            const width = container.clientWidth;
+            const height = container.clientHeight;
+            camera.aspect = width / height;
+            camera.updateProjectionMatrix();
+            renderer.setSize(width, height);
+        });
+        
+        // =====================
+        // INITIALIZE
+        // =====================
+        proteinData = generateProtein(55);
+        createProteinMeshes();
+        updateStats();
+        updateCameraPosition();
+        animate(0);
+        
+    })();
+    </script>
+</body>
+</html>
