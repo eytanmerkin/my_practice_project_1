@@ -237,7 +237,7 @@ def main():
         
         # Data is already processed in CSV, but ensure columns exist
         if 'POINT_DIFF_PER_GAME' not in df.columns:
-        df = calculate_metrics(df)
+            df = calculate_metrics(df)
         
         model, r2, rmse = train_model(df)
     
