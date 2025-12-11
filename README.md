@@ -95,31 +95,31 @@ An interactive tutorial for learning Git version control and GitHub.
 ---
 
 ### 🏀 NBA Win Predictor
-**Folder:** `nba_analysis/`
+**Files:** `nba_predictor.html` + `nba_analysis/`
 
-A comprehensive Python tool for analyzing the relationship between NBA team point differential and winning percentage, with interactive prediction capabilities.
+A comprehensive tool for analyzing the relationship between NBA team point differential and winning percentage.
 
-**Features:**
+**HTML Visualization (`nba_predictor.html`):**
+- Interactive scatter plot of point differential vs win %
+- Win predictor with slider controls
+- Pre-computed model results (R² = 94.2%)
+- Sample data table of top performers
+- Links to full Streamlit app
+
+**Python Analysis (`nba_analysis/`):**
 - Data collection from official NBA API (30+ seasons, ~900 team-seasons)
-- Linear regression analysis (R² ≈ 0.94)
+- Linear regression analysis
 - Interactive Streamlit web app with live predictions
 - Quartile analysis for early-season predictions
-- Beautiful visualizations and data explorer
 
-**Files:**
-- `pd_wp_analysis.py` - Command-line analysis script
-- `streamlit_app.py` - Interactive web dashboard
-- `quartile_predictor.py` - Early-season prediction tool
-- `requirements.txt` - Python dependencies
-
-**Quick Start:**
+**Quick Start (Streamlit):**
 ```bash
 cd nba_analysis
 pip install -r requirements.txt
 streamlit run streamlit_app.py
 ```
 
-**Technologies:** Python, Pandas, Scikit-learn, Streamlit, Plotly, NBA API
+**Technologies:** Canvas API, Python, Pandas, Scikit-learn, Streamlit, NBA API
 
 ---
 
@@ -163,7 +163,8 @@ my_practice_project_1/
 ├── israeli_stocks.html     # Stock market dashboard
 ├── machine_learning.html   # ML types interactive guide
 ├── git_guide.html          # Git/GitHub tutorial
-├── nba_analysis/           # NBA win prediction project
+├── nba_predictor.html      # NBA win predictor (HTML)
+├── nba_analysis/           # NBA Python analysis
 │   ├── pd_wp_analysis.py   # Command-line analysis
 │   ├── streamlit_app.py    # Interactive web app
 │   ├── quartile_predictor.py
