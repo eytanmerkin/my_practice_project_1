@@ -167,6 +167,10 @@
             background: linear-gradient(135deg, #7f1d1d 0%, #f05033 100%);
         }
         
+        .project-card.nba .card-preview {
+            background: linear-gradient(135deg, #c2410c 0%, #f97316 100%);
+        }
+        
         .card-content {
             padding: 28px;
         }
@@ -306,6 +310,7 @@
         .project-card:nth-child(2) { animation-delay: 0.2s; }
         .project-card:nth-child(3) { animation-delay: 0.3s; }
         .project-card:nth-child(4) { animation-delay: 0.4s; }
+        .project-card:nth-child(5) { animation-delay: 0.5s; }
     </style>
 </head>
 <body>
@@ -403,6 +408,30 @@
                         <div class="tech-tags">
                             <span class="tech-tag">Interactive</span>
                             <span class="tech-tag">Tutorial</span>
+                        </div>
+                        <span class="view-btn">
+                            View Project
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M5 12h14M12 5l7 7-7 7"/>
+                            </svg>
+                        </span>
+                    </div>
+                </div>
+            </a>
+            
+            <a href="nba_analysis/README.md" class="project-card nba">
+                <div class="card-preview">
+                    <div class="preview-visual">🏀</div>
+                </div>
+                <div class="card-content">
+                    <span class="card-tag">SPORTS ANALYTICS</span>
+                    <h2>NBA Win Predictor</h2>
+                    <p>Analyze NBA point differential vs winning percentage with interactive Streamlit app, regression analysis, and early-season predictions.</p>
+                    <div class="card-footer">
+                        <div class="tech-tags">
+                            <span class="tech-tag">Python</span>
+                            <span class="tech-tag">Streamlit</span>
+                            <span class="tech-tag">ML</span>
                         </div>
                         <span class="view-btn">
                             View Project

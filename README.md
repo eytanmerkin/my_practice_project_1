@@ -94,6 +94,35 @@ An interactive tutorial for learning Git version control and GitHub.
 
 ---
 
+### 🏀 NBA Win Predictor
+**Folder:** `nba_analysis/`
+
+A comprehensive Python tool for analyzing the relationship between NBA team point differential and winning percentage, with interactive prediction capabilities.
+
+**Features:**
+- Data collection from official NBA API (30+ seasons, ~900 team-seasons)
+- Linear regression analysis (R² ≈ 0.94)
+- Interactive Streamlit web app with live predictions
+- Quartile analysis for early-season predictions
+- Beautiful visualizations and data explorer
+
+**Files:**
+- `pd_wp_analysis.py` - Command-line analysis script
+- `streamlit_app.py` - Interactive web dashboard
+- `quartile_predictor.py` - Early-season prediction tool
+- `requirements.txt` - Python dependencies
+
+**Quick Start:**
+```bash
+cd nba_analysis
+pip install -r requirements.txt
+streamlit run streamlit_app.py
+```
+
+**Technologies:** Python, Pandas, Scikit-learn, Streamlit, Plotly, NBA API
+
+---
+
 ## 🎯 Index Page
 
 **File:** `index.html`
@@ -134,6 +163,13 @@ my_practice_project_1/
 ├── israeli_stocks.html     # Stock market dashboard
 ├── machine_learning.html   # ML types interactive guide
 ├── git_guide.html          # Git/GitHub tutorial
+├── nba_analysis/           # NBA win prediction project
+│   ├── pd_wp_analysis.py   # Command-line analysis
+│   ├── streamlit_app.py    # Interactive web app
+│   ├── quartile_predictor.py
+│   ├── requirements.txt
+│   ├── README.md           # Detailed documentation
+│   └── QUICKSTART.md       # Quick start guide
 ├── targil.py               # Python practice file
 └── README.md               # This file
 ```
@@ -161,6 +197,7 @@ Each project features:
 - **Protein Folding:** Simplified geometric visualization — not scientifically accurate. Do not use for research or medical purposes
 - **Machine Learning Guide:** Simplified demonstrations for educational purposes only
 - **Git Guide:** General information — always refer to official documentation
+- **NBA Win Predictor:** Historical analysis tool — predictions are statistical estimates, not guarantees. Do not use for betting
 - Always verify information from authoritative sources before relying on it
 
 ---
