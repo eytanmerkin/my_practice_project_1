@@ -1,0 +1,1221 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🤖 Machine Learning Types | Interactive Guide</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Fira+Code:wght@400;500&display=swap');
+        
+        :root {
+            --bg-dark: #0f0f1a;
+            --bg-card: #1a1a2e;
+            --bg-hover: #252542;
+            --accent-purple: #a855f7;
+            --accent-blue: #3b82f6;
+            --accent-green: #10b981;
+            --accent-orange: #f59e0b;
+            --accent-pink: #ec4899;
+            --text-primary: #f8fafc;
+            --text-secondary: #94a3b8;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg-dark);
+            color: var(--text-primary);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 40px 24px;
+        }
+        
+        header {
+            text-align: center;
+            margin-bottom: 60px;
+        }
+        
+        header h1 {
+            font-size: 3em;
+            font-weight: 700;
+            margin-bottom: 16px;
+            background: linear-gradient(135deg, var(--accent-purple) 0%, var(--accent-blue) 50%, var(--accent-green) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        header p {
+            font-size: 1.2em;
+            color: var(--text-secondary);
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        
+        .ml-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 24px;
+            margin-bottom: 60px;
+        }
+        
+        .ml-card {
+            background: var(--bg-card);
+            border-radius: 16px;
+            padding: 28px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .ml-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: var(--card-accent);
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+        
+        .ml-card:hover {
+            transform: translateY(-4px);
+            border-color: var(--card-accent);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+        }
+        
+        .ml-card:hover::before {
+            opacity: 1;
+        }
+        
+        .ml-card.active {
+            border-color: var(--card-accent);
+            background: var(--bg-hover);
+        }
+        
+        .ml-card.active::before {
+            opacity: 1;
+        }
+        
+        .card-icon {
+            width: 56px;
+            height: 56px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.8em;
+            margin-bottom: 20px;
+        }
+        
+        .ml-card h3 {
+            font-size: 1.3em;
+            font-weight: 600;
+            margin-bottom: 12px;
+        }
+        
+        .ml-card p {
+            color: var(--text-secondary);
+            font-size: 0.95em;
+            line-height: 1.6;
+        }
+        
+        .visualization-panel {
+            background: var(--bg-card);
+            border-radius: 20px;
+            padding: 40px;
+            margin-bottom: 40px;
+            min-height: 500px;
+        }
+        
+        .panel-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+        
+        .panel-title {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+        
+        .panel-title h2 {
+            font-size: 1.8em;
+            font-weight: 600;
+        }
+        
+        .panel-title .badge {
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 0.8em;
+            font-weight: 500;
+        }
+        
+        .controls {
+            display: flex;
+            gap: 12px;
+        }
+        
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            font-family: 'Inter', sans-serif;
+            font-size: 0.9em;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .btn-primary {
+            background: var(--accent-purple);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background: #9333ea;
+            transform: translateY(-1px);
+        }
+        
+        .btn-secondary {
+            background: rgba(255,255,255,0.1);
+            color: var(--text-primary);
+        }
+        
+        .btn-secondary:hover {
+            background: rgba(255,255,255,0.15);
+        }
+        
+        .visualization-area {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 40px;
+        }
+        
+        .demo-canvas {
+            background: rgba(0,0,0,0.3);
+            border-radius: 12px;
+            height: 350px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .demo-canvas canvas {
+            width: 100%;
+            height: 100%;
+        }
+        
+        .info-panel {
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+        }
+        
+        .info-section h4 {
+            font-size: 1em;
+            font-weight: 600;
+            margin-bottom: 12px;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-size: 0.8em;
+        }
+        
+        .info-section p {
+            line-height: 1.7;
+            color: var(--text-secondary);
+        }
+        
+        .examples-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+        
+        .example-tag {
+            padding: 6px 12px;
+            background: rgba(255,255,255,0.08);
+            border-radius: 6px;
+            font-size: 0.85em;
+        }
+        
+        .algorithm-list {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+        }
+        
+        .algo-item {
+            padding: 10px 14px;
+            background: rgba(255,255,255,0.05);
+            border-radius: 8px;
+            font-family: 'Fira Code', monospace;
+            font-size: 0.85em;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .algo-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+        }
+        
+        .comparison-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 40px;
+        }
+        
+        .comparison-table th,
+        .comparison-table td {
+            padding: 16px;
+            text-align: left;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+        
+        .comparison-table th {
+            background: rgba(255,255,255,0.05);
+            font-weight: 600;
+            font-size: 0.9em;
+        }
+        
+        .comparison-table td {
+            color: var(--text-secondary);
+            font-size: 0.9em;
+        }
+        
+        .comparison-table tr:hover td {
+            background: rgba(255,255,255,0.02);
+        }
+        
+        @media (max-width: 1000px) {
+            .ml-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .visualization-area {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        /* Animation for data points */
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.2); opacity: 0.7; }
+        }
+        
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🤖 Machine Learning Types</h1>
+            <p>Explore the different approaches to teaching machines how to learn from data and make predictions</p>
+        </header>
+        
+        <div class="ml-grid">
+            <div class="ml-card" data-type="supervised" style="--card-accent: var(--accent-blue);">
+                <div class="card-icon" style="background: rgba(59, 130, 246, 0.2);">🎯</div>
+                <h3>Supervised Learning</h3>
+                <p>Learn from labeled examples to predict outcomes for new data. Like learning with a teacher who provides answers.</p>
+            </div>
+            
+            <div class="ml-card" data-type="unsupervised" style="--card-accent: var(--accent-green);">
+                <div class="card-icon" style="background: rgba(16, 185, 129, 0.2);">🔍</div>
+                <h3>Unsupervised Learning</h3>
+                <p>Discover hidden patterns in data without labels. Like finding groups in a crowd without knowing who belongs where.</p>
+            </div>
+            
+            <div class="ml-card" data-type="reinforcement" style="--card-accent: var(--accent-orange);">
+                <div class="card-icon" style="background: rgba(245, 158, 11, 0.2);">🎮</div>
+                <h3>Reinforcement Learning</h3>
+                <p>Learn by trial and error through rewards and penalties. Like training a pet with treats for good behavior.</p>
+            </div>
+            
+            <div class="ml-card" data-type="semisupervised" style="--card-accent: var(--accent-purple);">
+                <div class="card-icon" style="background: rgba(168, 85, 247, 0.2);">🔀</div>
+                <h3>Semi-Supervised Learning</h3>
+                <p>Combine small amounts of labeled data with large amounts of unlabeled data. Best of both worlds.</p>
+            </div>
+            
+            <div class="ml-card" data-type="transfer" style="--card-accent: var(--accent-pink);">
+                <div class="card-icon" style="background: rgba(236, 72, 153, 0.2);">🔄</div>
+                <h3>Transfer Learning</h3>
+                <p>Apply knowledge learned from one task to a different but related task. Like using bike skills to learn motorcycle.</p>
+            </div>
+            
+            <div class="ml-card" data-type="deeplearning" style="--card-accent: #06b6d4;">
+                <div class="card-icon" style="background: rgba(6, 182, 212, 0.2);">🧠</div>
+                <h3>Deep Learning</h3>
+                <p>Neural networks with many layers that learn hierarchical representations. Powers AI breakthroughs today.</p>
+            </div>
+        </div>
+        
+        <div class="visualization-panel" id="viz-panel">
+            <div class="panel-header">
+                <div class="panel-title">
+                    <h2 id="panel-title">Supervised Learning</h2>
+                    <span class="badge" id="panel-badge" style="background: rgba(59, 130, 246, 0.2); color: var(--accent-blue);">Classification & Regression</span>
+                </div>
+                <div class="controls">
+                    <button class="btn btn-secondary" id="reset-btn">Reset</button>
+                    <button class="btn btn-primary" id="run-btn">▶ Run Demo</button>
+                </div>
+            </div>
+            
+            <div class="visualization-area">
+                <div class="demo-canvas">
+                    <canvas id="demo-canvas"></canvas>
+                </div>
+                
+                <div class="info-panel">
+                    <div class="info-section">
+                        <h4>How It Works</h4>
+                        <p id="description">Supervised learning uses labeled training data to learn a mapping from inputs to outputs. The algorithm learns patterns from examples where we know the correct answer, then applies this knowledge to make predictions on new, unseen data.</p>
+                    </div>
+                    
+                    <div class="info-section">
+                        <h4>Common Algorithms</h4>
+                        <div class="algorithm-list" id="algorithms">
+                            <div class="algo-item"><span class="algo-dot" style="background: var(--accent-blue);"></span>Linear Regression</div>
+                            <div class="algo-item"><span class="algo-dot" style="background: var(--accent-blue);"></span>Decision Trees</div>
+                            <div class="algo-item"><span class="algo-dot" style="background: var(--accent-blue);"></span>Random Forest</div>
+                            <div class="algo-item"><span class="algo-dot" style="background: var(--accent-blue);"></span>SVM</div>
+                        </div>
+                    </div>
+                    
+                    <div class="info-section">
+                        <h4>Real-World Applications</h4>
+                        <div class="examples-list" id="examples">
+                            <span class="example-tag">Email Spam Detection</span>
+                            <span class="example-tag">House Price Prediction</span>
+                            <span class="example-tag">Medical Diagnosis</span>
+                            <span class="example-tag">Credit Scoring</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <table class="comparison-table">
+            <thead>
+                <tr>
+                    <th>Type</th>
+                    <th>Data Required</th>
+                    <th>Goal</th>
+                    <th>Example</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><strong>Supervised</strong></td>
+                    <td>Labeled data (input + output)</td>
+                    <td>Predict outcomes</td>
+                    <td>Predict house prices from features</td>
+                </tr>
+                <tr>
+                    <td><strong>Unsupervised</strong></td>
+                    <td>Unlabeled data (input only)</td>
+                    <td>Find patterns/structure</td>
+                    <td>Customer segmentation</td>
+                </tr>
+                <tr>
+                    <td><strong>Reinforcement</strong></td>
+                    <td>Environment + rewards</td>
+                    <td>Maximize cumulative reward</td>
+                    <td>Game playing AI</td>
+                </tr>
+                <tr>
+                    <td><strong>Semi-Supervised</strong></td>
+                    <td>Small labeled + large unlabeled</td>
+                    <td>Leverage unlabeled data</td>
+                    <td>Image classification with few labels</td>
+                </tr>
+                <tr>
+                    <td><strong>Transfer</strong></td>
+                    <td>Pre-trained model + new data</td>
+                    <td>Apply prior knowledge</td>
+                    <td>Fine-tune GPT for specific task</td>
+                </tr>
+                <tr>
+                    <td><strong>Deep Learning</strong></td>
+                    <td>Large amounts of data</td>
+                    <td>Learn complex patterns</td>
+                    <td>Image recognition, NLP</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <script>
+    (function() {
+        // =====================
+        // ML TYPE DATA
+        // =====================
+        const mlTypes = {
+            supervised: {
+                title: 'Supervised Learning',
+                badge: 'Classification & Regression',
+                color: '#3b82f6',
+                description: 'Supervised learning uses labeled training data to learn a mapping from inputs to outputs. The algorithm learns patterns from examples where we know the correct answer, then applies this knowledge to make predictions on new, unseen data.',
+                algorithms: ['Linear Regression', 'Logistic Regression', 'Decision Trees', 'Random Forest', 'SVM', 'Neural Networks', 'KNN', 'Naive Bayes'],
+                examples: ['Email Spam Detection', 'House Price Prediction', 'Medical Diagnosis', 'Credit Scoring', 'Image Classification', 'Sentiment Analysis']
+            },
+            unsupervised: {
+                title: 'Unsupervised Learning',
+                badge: 'Clustering & Dimensionality Reduction',
+                color: '#10b981',
+                description: 'Unsupervised learning finds hidden patterns in data without labeled examples. The algorithm discovers structure on its own, grouping similar items together or reducing data complexity while preserving important information.',
+                algorithms: ['K-Means Clustering', 'Hierarchical Clustering', 'PCA', 'DBSCAN', 'Autoencoders', 't-SNE', 'Anomaly Detection', 'Association Rules'],
+                examples: ['Customer Segmentation', 'Recommendation Systems', 'Anomaly Detection', 'Topic Modeling', 'Data Compression', 'Feature Extraction']
+            },
+            reinforcement: {
+                title: 'Reinforcement Learning',
+                badge: 'Agent-Environment Interaction',
+                color: '#f59e0b',
+                description: 'Reinforcement learning trains agents to make decisions by interacting with an environment. The agent learns through trial and error, receiving rewards for good actions and penalties for bad ones, eventually discovering optimal strategies.',
+                algorithms: ['Q-Learning', 'Deep Q-Network (DQN)', 'Policy Gradient', 'Actor-Critic', 'PPO', 'A3C', 'SARSA', 'Monte Carlo'],
+                examples: ['Game Playing (Chess, Go)', 'Robotics Control', 'Autonomous Driving', 'Resource Management', 'Trading Strategies', 'Personalized Recommendations']
+            },
+            semisupervised: {
+                title: 'Semi-Supervised Learning',
+                badge: 'Partial Labels',
+                color: '#a855f7',
+                description: 'Semi-supervised learning combines a small amount of labeled data with a large amount of unlabeled data. This approach is useful when labeling data is expensive or time-consuming, leveraging the structure in unlabeled data to improve predictions.',
+                algorithms: ['Self-Training', 'Co-Training', 'Label Propagation', 'Graph-Based Methods', 'Pseudo-Labeling', 'MixMatch', 'FixMatch', 'Consistency Regularization'],
+                examples: ['Web Content Classification', 'Speech Recognition', 'Medical Image Analysis', 'Text Classification', 'Protein Function Prediction', 'Social Network Analysis']
+            },
+            transfer: {
+                title: 'Transfer Learning',
+                badge: 'Knowledge Transfer',
+                color: '#ec4899',
+                description: 'Transfer learning applies knowledge from one domain or task to another related domain or task. Instead of training from scratch, we fine-tune a pre-trained model, dramatically reducing training time and data requirements.',
+                algorithms: ['Fine-Tuning', 'Feature Extraction', 'Domain Adaptation', 'Multi-Task Learning', 'Zero-Shot Learning', 'Few-Shot Learning', 'Knowledge Distillation', 'Pre-training'],
+                examples: ['NLP with BERT/GPT', 'Image Recognition with ImageNet', 'Medical Imaging', 'Language Translation', 'Sentiment Analysis', 'Object Detection']
+            },
+            deeplearning: {
+                title: 'Deep Learning',
+                badge: 'Neural Networks',
+                color: '#06b6d4',
+                description: 'Deep learning uses neural networks with multiple layers to learn hierarchical representations of data. Each layer transforms the input, gradually extracting more abstract features. Deep learning powers most modern AI breakthroughs.',
+                algorithms: ['CNN (Convolutional)', 'RNN (Recurrent)', 'LSTM', 'Transformer', 'GAN', 'VAE', 'ResNet', 'Attention Mechanism'],
+                examples: ['Image Recognition', 'Natural Language Processing', 'Speech Recognition', 'Machine Translation', 'Autonomous Vehicles', 'Drug Discovery']
+            }
+        };
+        
+        // State
+        let currentType = 'supervised';
+        let isRunning = false;
+        let animationId = null;
+        let dataPoints = [];
+        
+        // =====================
+        // CANVAS SETUP
+        // =====================
+        const canvas = document.getElementById('demo-canvas');
+        const ctx = canvas.getContext('2d');
+        
+        function resizeCanvas() {
+            const rect = canvas.parentElement.getBoundingClientRect();
+            canvas.width = rect.width * 2;
+            canvas.height = rect.height * 2;
+            ctx.scale(2, 2);
+        }
+        
+        // =====================
+        // VISUALIZATION DEMOS
+        // =====================
+        function generateDataPoints(type) {
+            dataPoints = [];
+            const width = canvas.width / 2;
+            const height = canvas.height / 2;
+            
+            switch(type) {
+                case 'supervised':
+                    // Classification: two classes
+                    for (let i = 0; i < 30; i++) {
+                        dataPoints.push({
+                            x: 50 + Math.random() * 150,
+                            y: 50 + Math.random() * 120,
+                            class: 0,
+                            classified: false
+                        });
+                    }
+                    for (let i = 0; i < 30; i++) {
+                        dataPoints.push({
+                            x: width - 200 + Math.random() * 150,
+                            y: height - 170 + Math.random() * 120,
+                            class: 1,
+                            classified: false
+                        });
+                    }
+                    break;
+                    
+                case 'unsupervised':
+                    // Clustering: three clusters
+                    const centers = [
+                        { x: width * 0.25, y: height * 0.3 },
+                        { x: width * 0.7, y: height * 0.25 },
+                        { x: width * 0.5, y: height * 0.75 }
+                    ];
+                    centers.forEach((center, idx) => {
+                        for (let i = 0; i < 20; i++) {
+                            dataPoints.push({
+                                x: center.x + (Math.random() - 0.5) * 100,
+                                y: center.y + (Math.random() - 0.5) * 80,
+                                cluster: -1,
+                                targetCluster: idx
+                            });
+                        }
+                    });
+                    break;
+                    
+                case 'reinforcement':
+                    // Agent navigating grid
+                    dataPoints = [{
+                        x: 50,
+                        y: height / 2,
+                        targetX: width - 50,
+                        targetY: height / 2,
+                        path: [{x: 50, y: height / 2}],
+                        rewards: []
+                    }];
+                    // Add obstacles
+                    for (let i = 0; i < 5; i++) {
+                        dataPoints.push({
+                            x: 100 + Math.random() * (width - 200),
+                            y: 50 + Math.random() * (height - 100),
+                            isObstacle: true,
+                            radius: 20 + Math.random() * 20
+                        });
+                    }
+                    break;
+                    
+                case 'semisupervised':
+                    // Mix of labeled and unlabeled
+                    for (let i = 0; i < 50; i++) {
+                        const isLabeled = i < 10;
+                        const classLabel = i < 25 ? 0 : 1;
+                        dataPoints.push({
+                            x: classLabel === 0 ? 80 + Math.random() * 140 : width - 220 + Math.random() * 140,
+                            y: 60 + Math.random() * (height - 120),
+                            class: classLabel,
+                            labeled: isLabeled,
+                            propagated: false
+                        });
+                    }
+                    break;
+                    
+                case 'transfer':
+                    // Knowledge transfer visualization
+                    dataPoints = {
+                        sourceModel: { x: width * 0.25, y: height * 0.5, knowledge: [] },
+                        targetModel: { x: width * 0.75, y: height * 0.5, knowledge: [] },
+                        transferring: false,
+                        progress: 0
+                    };
+                    for (let i = 0; i < 8; i++) {
+                        dataPoints.sourceModel.knowledge.push({
+                            angle: (i / 8) * Math.PI * 2,
+                            radius: 60,
+                            transferred: false
+                        });
+                    }
+                    break;
+                    
+                case 'deeplearning':
+                    // Neural network visualization
+                    const layers = [4, 6, 6, 4, 2];
+                    dataPoints = { layers: [], connections: [], activations: [] };
+                    layers.forEach((nodeCount, layerIdx) => {
+                        const layerX = 60 + layerIdx * ((width - 120) / (layers.length - 1));
+                        for (let i = 0; i < nodeCount; i++) {
+                            const nodeY = (height / 2) + (i - (nodeCount - 1) / 2) * 40;
+                            dataPoints.layers.push({
+                                x: layerX,
+                                y: nodeY,
+                                layer: layerIdx,
+                                activated: false
+                            });
+                        }
+                    });
+                    break;
+            }
+        }
+        
+        function drawVisualization() {
+            const width = canvas.width / 2;
+            const height = canvas.height / 2;
+            
+            ctx.clearRect(0, 0, width, height);
+            
+            const type = mlTypes[currentType];
+            
+            switch(currentType) {
+                case 'supervised':
+                    drawSupervisedDemo(width, height, type.color);
+                    break;
+                case 'unsupervised':
+                    drawUnsupervisedDemo(width, height, type.color);
+                    break;
+                case 'reinforcement':
+                    drawReinforcementDemo(width, height, type.color);
+                    break;
+                case 'semisupervised':
+                    drawSemiSupervisedDemo(width, height, type.color);
+                    break;
+                case 'transfer':
+                    drawTransferDemo(width, height, type.color);
+                    break;
+                case 'deeplearning':
+                    drawDeepLearningDemo(width, height, type.color);
+                    break;
+            }
+        }
+        
+        function drawSupervisedDemo(width, height, color) {
+            // Draw decision boundary if classified
+            const hasClassified = dataPoints.some(p => p.classified);
+            if (hasClassified) {
+                ctx.fillStyle = 'rgba(59, 130, 246, 0.1)';
+                ctx.beginPath();
+                ctx.moveTo(0, 0);
+                ctx.lineTo(width, height);
+                ctx.lineTo(0, height);
+                ctx.closePath();
+                ctx.fill();
+                
+                ctx.fillStyle = 'rgba(239, 68, 68, 0.1)';
+                ctx.beginPath();
+                ctx.moveTo(0, 0);
+                ctx.lineTo(width, 0);
+                ctx.lineTo(width, height);
+                ctx.closePath();
+                ctx.fill();
+                
+                // Draw boundary line
+                ctx.strokeStyle = 'rgba(255,255,255,0.5)';
+                ctx.lineWidth = 2;
+                ctx.setLineDash([5, 5]);
+                ctx.beginPath();
+                ctx.moveTo(0, 0);
+                ctx.lineTo(width, height);
+                ctx.stroke();
+                ctx.setLineDash([]);
+            }
+            
+            // Draw points
+            dataPoints.forEach(point => {
+                ctx.beginPath();
+                ctx.arc(point.x, point.y, point.classified ? 10 : 8, 0, Math.PI * 2);
+                ctx.fillStyle = point.class === 0 ? '#3b82f6' : '#ef4444';
+                ctx.fill();
+                if (point.classified) {
+                    ctx.strokeStyle = '#fff';
+                    ctx.lineWidth = 2;
+                    ctx.stroke();
+                }
+            });
+            
+            // Labels
+            ctx.fillStyle = '#fff';
+            ctx.font = '12px Inter';
+            ctx.fillText('Class A', 30, 30);
+            ctx.fillText('Class B', width - 70, height - 20);
+        }
+        
+        function drawUnsupervisedDemo(width, height, color) {
+            const clusterColors = ['#3b82f6', '#10b981', '#f59e0b'];
+            
+            // Draw cluster centers if clustered
+            const hasClustered = dataPoints.some(p => p.cluster >= 0);
+            if (hasClustered) {
+                const centers = [0, 1, 2].map(c => {
+                    const points = dataPoints.filter(p => p.cluster === c);
+                    if (points.length === 0) return null;
+                    return {
+                        x: points.reduce((s, p) => s + p.x, 0) / points.length,
+                        y: points.reduce((s, p) => s + p.y, 0) / points.length
+                    };
+                });
+                
+                centers.forEach((center, idx) => {
+                    if (!center) return;
+                    ctx.beginPath();
+                    ctx.arc(center.x, center.y, 40, 0, Math.PI * 2);
+                    ctx.fillStyle = clusterColors[idx] + '20';
+                    ctx.fill();
+                    ctx.strokeStyle = clusterColors[idx];
+                    ctx.lineWidth = 2;
+                    ctx.stroke();
+                });
+            }
+            
+            // Draw points
+            dataPoints.forEach(point => {
+                ctx.beginPath();
+                ctx.arc(point.x, point.y, 6, 0, Math.PI * 2);
+                ctx.fillStyle = point.cluster >= 0 ? clusterColors[point.cluster] : '#64748b';
+                ctx.fill();
+            });
+            
+            ctx.fillStyle = '#fff';
+            ctx.font = '12px Inter';
+            ctx.fillText('Discovering clusters...', 30, 30);
+        }
+        
+        function drawReinforcementDemo(width, height, color) {
+            const agent = dataPoints[0];
+            const obstacles = dataPoints.filter(p => p.isObstacle);
+            
+            // Draw target
+            ctx.beginPath();
+            ctx.arc(agent.targetX, agent.targetY, 20, 0, Math.PI * 2);
+            ctx.fillStyle = 'rgba(16, 185, 129, 0.3)';
+            ctx.fill();
+            ctx.strokeStyle = '#10b981';
+            ctx.lineWidth = 3;
+            ctx.stroke();
+            ctx.fillStyle = '#10b981';
+            ctx.font = '16px Inter';
+            ctx.fillText('🎯', agent.targetX - 10, agent.targetY + 6);
+            
+            // Draw obstacles
+            obstacles.forEach(obs => {
+                ctx.beginPath();
+                ctx.arc(obs.x, obs.y, obs.radius, 0, Math.PI * 2);
+                ctx.fillStyle = 'rgba(239, 68, 68, 0.3)';
+                ctx.fill();
+                ctx.strokeStyle = '#ef4444';
+                ctx.lineWidth = 2;
+                ctx.stroke();
+            });
+            
+            // Draw path
+            if (agent.path.length > 1) {
+                ctx.beginPath();
+                ctx.moveTo(agent.path[0].x, agent.path[0].y);
+                agent.path.forEach(p => ctx.lineTo(p.x, p.y));
+                ctx.strokeStyle = color;
+                ctx.lineWidth = 2;
+                ctx.stroke();
+            }
+            
+            // Draw agent
+            ctx.beginPath();
+            ctx.arc(agent.x, agent.y, 12, 0, Math.PI * 2);
+            ctx.fillStyle = color;
+            ctx.fill();
+            ctx.fillStyle = '#fff';
+            ctx.font = '14px Inter';
+            ctx.fillText('🤖', agent.x - 8, agent.y + 5);
+            
+            // Draw rewards
+            agent.rewards.forEach(r => {
+                ctx.fillStyle = r.value > 0 ? '#10b981' : '#ef4444';
+                ctx.font = '12px Inter';
+                ctx.fillText(r.value > 0 ? '+1' : '-1', r.x, r.y);
+            });
+        }
+        
+        function drawSemiSupervisedDemo(width, height, color) {
+            dataPoints.forEach(point => {
+                ctx.beginPath();
+                const radius = point.labeled ? 10 : 6;
+                ctx.arc(point.x, point.y, radius, 0, Math.PI * 2);
+                
+                if (point.labeled) {
+                    ctx.fillStyle = point.class === 0 ? '#3b82f6' : '#ef4444';
+                    ctx.fill();
+                    ctx.strokeStyle = '#fff';
+                    ctx.lineWidth = 2;
+                    ctx.stroke();
+                } else if (point.propagated) {
+                    ctx.fillStyle = point.class === 0 ? 'rgba(59, 130, 246, 0.6)' : 'rgba(239, 68, 68, 0.6)';
+                    ctx.fill();
+                } else {
+                    ctx.fillStyle = '#64748b';
+                    ctx.fill();
+                }
+            });
+            
+            ctx.fillStyle = '#fff';
+            ctx.font = '12px Inter';
+            ctx.fillText('● Labeled', 30, 30);
+            ctx.fillStyle = '#64748b';
+            ctx.fillText('● Unlabeled', 30, 50);
+        }
+        
+        function drawTransferDemo(width, height, color) {
+            const { sourceModel, targetModel, progress } = dataPoints;
+            
+            // Source model
+            ctx.beginPath();
+            ctx.arc(sourceModel.x, sourceModel.y, 70, 0, Math.PI * 2);
+            ctx.fillStyle = 'rgba(168, 85, 247, 0.2)';
+            ctx.fill();
+            ctx.strokeStyle = '#a855f7';
+            ctx.lineWidth = 3;
+            ctx.stroke();
+            
+            ctx.fillStyle = '#fff';
+            ctx.font = '14px Inter';
+            ctx.textAlign = 'center';
+            ctx.fillText('Source Model', sourceModel.x, sourceModel.y + 100);
+            ctx.fillText('(Pre-trained)', sourceModel.x, sourceModel.y + 118);
+            
+            // Knowledge nodes
+            sourceModel.knowledge.forEach((k, i) => {
+                const x = sourceModel.x + Math.cos(k.angle) * k.radius;
+                const y = sourceModel.y + Math.sin(k.angle) * k.radius;
+                ctx.beginPath();
+                ctx.arc(x, y, 8, 0, Math.PI * 2);
+                ctx.fillStyle = k.transferred ? '#64748b' : '#a855f7';
+                ctx.fill();
+            });
+            
+            // Target model
+            ctx.beginPath();
+            ctx.arc(targetModel.x, targetModel.y, 70, 0, Math.PI * 2);
+            ctx.fillStyle = 'rgba(236, 72, 153, 0.2)';
+            ctx.fill();
+            ctx.strokeStyle = '#ec4899';
+            ctx.lineWidth = 3;
+            ctx.stroke();
+            
+            ctx.fillText('Target Model', targetModel.x, targetModel.y + 100);
+            ctx.fillText('(Fine-tuned)', targetModel.x, targetModel.y + 118);
+            
+            // Transferred knowledge
+            targetModel.knowledge.forEach((k, i) => {
+                const x = targetModel.x + Math.cos(k.angle) * k.radius;
+                const y = targetModel.y + Math.sin(k.angle) * k.radius;
+                ctx.beginPath();
+                ctx.arc(x, y, 8, 0, Math.PI * 2);
+                ctx.fillStyle = '#ec4899';
+                ctx.fill();
+            });
+            
+            // Transfer arrow
+            if (dataPoints.transferring) {
+                const arrowX = sourceModel.x + (targetModel.x - sourceModel.x) * progress;
+                ctx.beginPath();
+                ctx.arc(arrowX, sourceModel.y, 10, 0, Math.PI * 2);
+                ctx.fillStyle = '#ffd700';
+                ctx.fill();
+            }
+            
+            ctx.textAlign = 'left';
+        }
+        
+        function drawDeepLearningDemo(width, height, color) {
+            const { layers, connections } = dataPoints;
+            
+            // Draw connections
+            for (let i = 0; i < layers.length; i++) {
+                const node = layers[i];
+                const nextLayerNodes = layers.filter(n => n.layer === node.layer + 1);
+                nextLayerNodes.forEach(next => {
+                    ctx.beginPath();
+                    ctx.moveTo(node.x, node.y);
+                    ctx.lineTo(next.x, next.y);
+                    ctx.strokeStyle = node.activated && next.activated ? 'rgba(6, 182, 212, 0.6)' : 'rgba(255,255,255,0.1)';
+                    ctx.lineWidth = node.activated && next.activated ? 2 : 1;
+                    ctx.stroke();
+                });
+            }
+            
+            // Draw nodes
+            layers.forEach(node => {
+                ctx.beginPath();
+                ctx.arc(node.x, node.y, 12, 0, Math.PI * 2);
+                ctx.fillStyle = node.activated ? color : 'rgba(255,255,255,0.2)';
+                ctx.fill();
+                if (node.activated) {
+                    ctx.strokeStyle = '#fff';
+                    ctx.lineWidth = 2;
+                    ctx.stroke();
+                }
+            });
+            
+            // Labels
+            ctx.fillStyle = '#fff';
+            ctx.font = '11px Inter';
+            ctx.textAlign = 'center';
+            ctx.fillText('Input', 60, height - 20);
+            ctx.fillText('Hidden Layers', width / 2, height - 20);
+            ctx.fillText('Output', width - 60, height - 20);
+            ctx.textAlign = 'left';
+        }
+        
+        // =====================
+        // ANIMATIONS
+        // =====================
+        function runDemo() {
+            if (isRunning) return;
+            isRunning = true;
+            
+            switch(currentType) {
+                case 'supervised':
+                    animateSupervisedDemo();
+                    break;
+                case 'unsupervised':
+                    animateUnsupervisedDemo();
+                    break;
+                case 'reinforcement':
+                    animateReinforcementDemo();
+                    break;
+                case 'semisupervised':
+                    animateSemiSupervisedDemo();
+                    break;
+                case 'transfer':
+                    animateTransferDemo();
+                    break;
+                case 'deeplearning':
+                    animateDeepLearningDemo();
+                    break;
+            }
+        }
+        
+        function animateSupervisedDemo() {
+            let idx = 0;
+            function step() {
+                if (idx < dataPoints.length) {
+                    dataPoints[idx].classified = true;
+                    idx++;
+                    drawVisualization();
+                    animationId = setTimeout(step, 50);
+                } else {
+                    isRunning = false;
+                }
+            }
+            step();
+        }
+        
+        function animateUnsupervisedDemo() {
+            let iteration = 0;
+            function step() {
+                if (iteration < 20) {
+                    dataPoints.forEach(point => {
+                        // Simple k-means simulation
+                        point.cluster = point.targetCluster;
+                    });
+                    iteration++;
+                    drawVisualization();
+                    animationId = setTimeout(step, 100);
+                } else {
+                    isRunning = false;
+                }
+            }
+            step();
+        }
+        
+        function animateReinforcementDemo() {
+            const agent = dataPoints[0];
+            const obstacles = dataPoints.filter(p => p.isObstacle);
+            
+            function step() {
+                const dx = agent.targetX - agent.x;
+                const dy = agent.targetY - agent.y;
+                const dist = Math.sqrt(dx*dx + dy*dy);
+                
+                if (dist < 30) {
+                    agent.rewards.push({ x: agent.x, y: agent.y - 20, value: 10 });
+                    isRunning = false;
+                    drawVisualization();
+                    return;
+                }
+                
+                // Move with some randomness (exploration)
+                let moveX = dx / dist * 5 + (Math.random() - 0.5) * 3;
+                let moveY = dy / dist * 5 + (Math.random() - 0.5) * 3;
+                
+                // Check obstacles
+                obstacles.forEach(obs => {
+                    const odx = agent.x + moveX - obs.x;
+                    const ody = agent.y + moveY - obs.y;
+                    const odist = Math.sqrt(odx*odx + ody*ody);
+                    if (odist < obs.radius + 15) {
+                        moveX = -moveX + (Math.random() - 0.5) * 10;
+                        moveY = -moveY + (Math.random() - 0.5) * 10;
+                        agent.rewards.push({ x: agent.x, y: agent.y - 15, value: -1 });
+                    }
+                });
+                
+                agent.x += moveX;
+                agent.y += moveY;
+                agent.path.push({ x: agent.x, y: agent.y });
+                
+                if (agent.path.length > 100) agent.path.shift();
+                if (agent.rewards.length > 5) agent.rewards.shift();
+                
+                drawVisualization();
+                animationId = requestAnimationFrame(step);
+            }
+            step();
+        }
+        
+        function animateSemiSupervisedDemo() {
+            let iteration = 0;
+            function step() {
+                if (iteration < dataPoints.length) {
+                    const unlabeled = dataPoints.filter(p => !p.labeled && !p.propagated);
+                    if (unlabeled.length > 0) {
+                        const point = unlabeled[Math.floor(Math.random() * unlabeled.length)];
+                        point.propagated = true;
+                    }
+                    iteration++;
+                    drawVisualization();
+                    animationId = setTimeout(step, 80);
+                } else {
+                    isRunning = false;
+                }
+            }
+            step();
+        }
+        
+        function animateTransferDemo() {
+            const { sourceModel, targetModel } = dataPoints;
+            dataPoints.transferring = true;
+            let knowledgeIdx = 0;
+            
+            function step() {
+                if (knowledgeIdx < sourceModel.knowledge.length) {
+                    dataPoints.progress = (knowledgeIdx + 1) / sourceModel.knowledge.length;
+                    sourceModel.knowledge[knowledgeIdx].transferred = true;
+                    targetModel.knowledge.push({
+                        angle: sourceModel.knowledge[knowledgeIdx].angle,
+                        radius: 60
+                    });
+                    knowledgeIdx++;
+                    drawVisualization();
+                    animationId = setTimeout(step, 300);
+                } else {
+                    dataPoints.transferring = false;
+                    isRunning = false;
+                    drawVisualization();
+                }
+            }
+            step();
+        }
+        
+        function animateDeepLearningDemo() {
+            const { layers } = dataPoints;
+            let layerIdx = 0;
+            
+            function activateLayer() {
+                const nodesInLayer = layers.filter(n => n.layer === layerIdx);
+                let nodeIdx = 0;
+                
+                function activateNode() {
+                    if (nodeIdx < nodesInLayer.length) {
+                        nodesInLayer[nodeIdx].activated = true;
+                        nodeIdx++;
+                        drawVisualization();
+                        animationId = setTimeout(activateNode, 50);
+                    } else {
+                        layerIdx++;
+                        if (layerIdx <= 4) {
+                            animationId = setTimeout(activateLayer, 200);
+                        } else {
+                            isRunning = false;
+                        }
+                    }
+                }
+                activateNode();
+            }
+            activateLayer();
+        }
+        
+        // =====================
+        // UI UPDATES
+        // =====================
+        function updatePanel(type) {
+            const data = mlTypes[type];
+            
+            document.getElementById('panel-title').textContent = data.title;
+            document.getElementById('panel-badge').textContent = data.badge;
+            document.getElementById('panel-badge').style.background = data.color + '30';
+            document.getElementById('panel-badge').style.color = data.color;
+            document.getElementById('description').textContent = data.description;
+            
+            document.getElementById('algorithms').innerHTML = data.algorithms.slice(0, 8).map(algo => `
+                <div class="algo-item">
+                    <span class="algo-dot" style="background: ${data.color};"></span>
+                    ${algo}
+                </div>
+            `).join('');
+            
+            document.getElementById('examples').innerHTML = data.examples.map(ex => `
+                <span class="example-tag">${ex}</span>
+            `).join('');
+        }
+        
+        function resetDemo() {
+            if (animationId) {
+                clearTimeout(animationId);
+                cancelAnimationFrame(animationId);
+            }
+            isRunning = false;
+            generateDataPoints(currentType);
+            drawVisualization();
+        }
+        
+        // =====================
+        // EVENT LISTENERS
+        // =====================
+        document.querySelectorAll('.ml-card').forEach(card => {
+            card.addEventListener('click', () => {
+                document.querySelectorAll('.ml-card').forEach(c => c.classList.remove('active'));
+                card.classList.add('active');
+                currentType = card.dataset.type;
+                updatePanel(currentType);
+                resetDemo();
+            });
+        });
+        
+        document.getElementById('run-btn').addEventListener('click', runDemo);
+        document.getElementById('reset-btn').addEventListener('click', resetDemo);
+        
+        window.addEventListener('resize', () => {
+            resizeCanvas();
+            drawVisualization();
+        });
+        
+        // =====================
+        // INITIALIZE
+        // =====================
+        document.querySelector('.ml-card').classList.add('active');
+        resizeCanvas();
+        generateDataPoints(currentType);
+        drawVisualization();
+        
+    })();
+    </script>
+</body>
+</html>
+

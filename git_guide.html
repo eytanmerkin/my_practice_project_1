@@ -1,0 +1,968 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🔀 Git & GitHub | Interactive Learning Guide</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
+        
+        :root {
+            --git-orange: #f05033;
+            --github-dark: #24292e;
+            --bg-primary: #0d1117;
+            --bg-secondary: #161b22;
+            --bg-tertiary: #21262d;
+            --accent-green: #238636;
+            --accent-blue: #58a6ff;
+            --accent-purple: #8b5cf6;
+            --text-primary: #f0f6fc;
+            --text-secondary: #8b949e;
+            --border-color: #30363d;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            line-height: 1.6;
+        }
+        
+        /* Navigation */
+        nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background: rgba(13, 17, 23, 0.95);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid var(--border-color);
+            z-index: 100;
+            padding: 16px 24px;
+        }
+        
+        .nav-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .nav-logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-weight: 600;
+            font-size: 1.2em;
+        }
+        
+        .nav-links {
+            display: flex;
+            gap: 32px;
+        }
+        
+        .nav-links a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 0.95em;
+            transition: color 0.2s;
+        }
+        
+        .nav-links a:hover {
+            color: var(--text-primary);
+        }
+        
+        /* Hero */
+        .hero {
+            padding: 140px 24px 80px;
+            text-align: center;
+            background: linear-gradient(180deg, var(--bg-secondary) 0%, var(--bg-primary) 100%);
+        }
+        
+        .hero h1 {
+            font-size: 3.5em;
+            font-weight: 700;
+            margin-bottom: 20px;
+        }
+        
+        .hero h1 .git { color: var(--git-orange); }
+        .hero h1 .github { color: var(--text-primary); }
+        
+        .hero p {
+            font-size: 1.3em;
+            color: var(--text-secondary);
+            max-width: 600px;
+            margin: 0 auto 40px;
+        }
+        
+        .hero-icons {
+            display: flex;
+            justify-content: center;
+            gap: 40px;
+            margin-bottom: 40px;
+        }
+        
+        .hero-icon {
+            width: 80px;
+            height: 80px;
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.5em;
+        }
+        
+        .hero-icon.git { background: rgba(240, 80, 51, 0.2); }
+        .hero-icon.github { background: rgba(255, 255, 255, 0.1); }
+        
+        /* Sections */
+        section {
+            padding: 80px 24px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .section-header {
+            text-align: center;
+            margin-bottom: 60px;
+        }
+        
+        .section-header h2 {
+            font-size: 2.5em;
+            margin-bottom: 16px;
+        }
+        
+        .section-header p {
+            color: var(--text-secondary);
+            font-size: 1.1em;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        
+        /* Concepts Grid */
+        .concepts-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 24px;
+        }
+        
+        .concept-card {
+            background: var(--bg-secondary);
+            border-radius: 12px;
+            padding: 28px;
+            border: 1px solid var(--border-color);
+            transition: all 0.3s;
+        }
+        
+        .concept-card:hover {
+            transform: translateY(-4px);
+            border-color: var(--accent-blue);
+            box-shadow: 0 12px 40px rgba(0,0,0,0.3);
+        }
+        
+        .concept-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5em;
+            margin-bottom: 16px;
+            background: rgba(88, 166, 255, 0.15);
+        }
+        
+        .concept-card h3 {
+            font-size: 1.2em;
+            margin-bottom: 10px;
+        }
+        
+        .concept-card p {
+            color: var(--text-secondary);
+            font-size: 0.95em;
+        }
+        
+        /* Interactive Demo */
+        .demo-section {
+            background: var(--bg-secondary);
+            border-radius: 16px;
+            padding: 40px;
+            border: 1px solid var(--border-color);
+        }
+        
+        .demo-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+        
+        .demo-tabs {
+            display: flex;
+            gap: 8px;
+        }
+        
+        .demo-tab {
+            padding: 10px 20px;
+            border: none;
+            background: transparent;
+            color: var(--text-secondary);
+            font-family: 'Poppins', sans-serif;
+            font-size: 0.95em;
+            cursor: pointer;
+            border-radius: 8px;
+            transition: all 0.2s;
+        }
+        
+        .demo-tab:hover {
+            background: var(--bg-tertiary);
+        }
+        
+        .demo-tab.active {
+            background: var(--accent-green);
+            color: white;
+        }
+        
+        .terminal {
+            background: #0d1117;
+            border-radius: 12px;
+            overflow: hidden;
+            border: 1px solid var(--border-color);
+        }
+        
+        .terminal-header {
+            background: var(--bg-tertiary);
+            padding: 12px 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .terminal-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+        }
+        
+        .terminal-dot.red { background: #ff5f56; }
+        .terminal-dot.yellow { background: #ffbd2e; }
+        .terminal-dot.green { background: #27ca40; }
+        
+        .terminal-title {
+            margin-left: 12px;
+            color: var(--text-secondary);
+            font-size: 0.85em;
+        }
+        
+        .terminal-body {
+            padding: 20px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.9em;
+            min-height: 300px;
+        }
+        
+        .command-line {
+            display: flex;
+            align-items: flex-start;
+            margin-bottom: 12px;
+            opacity: 0;
+            transform: translateY(10px);
+            animation: fadeIn 0.3s forwards;
+        }
+        
+        .prompt {
+            color: var(--accent-green);
+            margin-right: 8px;
+            user-select: none;
+        }
+        
+        .command {
+            color: var(--accent-blue);
+        }
+        
+        .output {
+            color: var(--text-secondary);
+            margin-left: 20px;
+            margin-bottom: 16px;
+            font-size: 0.85em;
+        }
+        
+        .output.success { color: var(--accent-green); }
+        .output.error { color: #f85149; }
+        
+        @keyframes fadeIn {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        /* Workflow */
+        .workflow-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 20px;
+            margin-top: 40px;
+            flex-wrap: wrap;
+        }
+        
+        .workflow-step {
+            flex: 1;
+            min-width: 150px;
+            text-align: center;
+            padding: 24px;
+            background: var(--bg-secondary);
+            border-radius: 12px;
+            border: 1px solid var(--border-color);
+            position: relative;
+        }
+        
+        .workflow-step::after {
+            content: '→';
+            position: absolute;
+            right: -25px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-secondary);
+            font-size: 1.5em;
+        }
+        
+        .workflow-step:last-child::after {
+            display: none;
+        }
+        
+        .workflow-step .icon {
+            font-size: 2em;
+            margin-bottom: 12px;
+        }
+        
+        .workflow-step h4 {
+            font-size: 1em;
+            margin-bottom: 8px;
+        }
+        
+        .workflow-step p {
+            font-size: 0.85em;
+            color: var(--text-secondary);
+        }
+        
+        /* Commands Reference */
+        .commands-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 16px;
+        }
+        
+        .command-item {
+            background: var(--bg-secondary);
+            border-radius: 10px;
+            padding: 16px 20px;
+            border: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .command-item:hover {
+            border-color: var(--accent-blue);
+            background: var(--bg-tertiary);
+        }
+        
+        .command-item code {
+            font-family: 'JetBrains Mono', monospace;
+            background: rgba(88, 166, 255, 0.15);
+            color: var(--accent-blue);
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-size: 0.85em;
+            white-space: nowrap;
+        }
+        
+        .command-item span {
+            color: var(--text-secondary);
+            font-size: 0.9em;
+        }
+        
+        /* Comparison */
+        .comparison {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 40px;
+            margin-top: 40px;
+        }
+        
+        .comparison-card {
+            background: var(--bg-secondary);
+            border-radius: 16px;
+            padding: 32px;
+            border: 2px solid transparent;
+            transition: all 0.3s;
+        }
+        
+        .comparison-card.git {
+            border-color: var(--git-orange);
+        }
+        
+        .comparison-card.github {
+            border-color: var(--text-secondary);
+        }
+        
+        .comparison-card h3 {
+            font-size: 1.5em;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        .comparison-card ul {
+            list-style: none;
+        }
+        
+        .comparison-card li {
+            padding: 12px 0;
+            border-bottom: 1px solid var(--border-color);
+            color: var(--text-secondary);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .comparison-card li:last-child {
+            border-bottom: none;
+        }
+        
+        .comparison-card li::before {
+            content: '✓';
+            color: var(--accent-green);
+            font-weight: bold;
+        }
+        
+        /* Quiz Section */
+        .quiz-container {
+            background: var(--bg-secondary);
+            border-radius: 16px;
+            padding: 40px;
+            border: 1px solid var(--border-color);
+        }
+        
+        .quiz-question {
+            margin-bottom: 24px;
+        }
+        
+        .quiz-question h4 {
+            font-size: 1.1em;
+            margin-bottom: 16px;
+        }
+        
+        .quiz-options {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+        
+        .quiz-option {
+            padding: 14px 20px;
+            background: var(--bg-tertiary);
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+            border: 2px solid transparent;
+        }
+        
+        .quiz-option:hover {
+            background: rgba(88, 166, 255, 0.1);
+            border-color: var(--accent-blue);
+        }
+        
+        .quiz-option.correct {
+            background: rgba(35, 134, 54, 0.2);
+            border-color: var(--accent-green);
+        }
+        
+        .quiz-option.wrong {
+            background: rgba(248, 81, 73, 0.2);
+            border-color: #f85149;
+        }
+        
+        .quiz-result {
+            padding: 20px;
+            background: var(--bg-tertiary);
+            border-radius: 10px;
+            text-align: center;
+            margin-top: 24px;
+            display: none;
+        }
+        
+        .quiz-result.show {
+            display: block;
+        }
+        
+        /* Footer */
+        footer {
+            background: var(--bg-secondary);
+            border-top: 1px solid var(--border-color);
+            padding: 40px 24px;
+            text-align: center;
+            margin-top: 80px;
+        }
+        
+        footer p {
+            color: var(--text-secondary);
+        }
+        
+        footer a {
+            color: var(--accent-blue);
+            text-decoration: none;
+        }
+        
+        @media (max-width: 768px) {
+            .hero h1 { font-size: 2.5em; }
+            .comparison { grid-template-columns: 1fr; }
+            .workflow-step::after { display: none; }
+            .nav-links { display: none; }
+        }
+    </style>
+</head>
+<body>
+    <nav>
+        <div class="nav-content">
+            <div class="nav-logo">
+                <span>🔀</span>
+                <span>Git Guide</span>
+            </div>
+            <div class="nav-links">
+                <a href="#what-is">What is Git?</a>
+                <a href="#concepts">Concepts</a>
+                <a href="#demo">Try It</a>
+                <a href="#commands">Commands</a>
+                <a href="#quiz">Quiz</a>
+            </div>
+        </div>
+    </nav>
+    
+    <section class="hero">
+        <div class="hero-icons">
+            <div class="hero-icon git">🔥</div>
+            <div class="hero-icon github">🐙</div>
+        </div>
+        <h1><span class="git">Git</span> & <span class="github">GitHub</span></h1>
+        <p>Learn version control and collaborative development with this interactive guide</p>
+    </section>
+    
+    <section id="what-is">
+        <div class="section-header">
+            <h2>What's the Difference?</h2>
+            <p>Understanding Git vs GitHub is the first step</p>
+        </div>
+        
+        <div class="comparison">
+            <div class="comparison-card git">
+                <h3><span style="color: var(--git-orange);">🔥</span> Git</h3>
+                <ul>
+                    <li>Version control system (software)</li>
+                    <li>Runs locally on your computer</li>
+                    <li>Tracks changes in your code</li>
+                    <li>Creates a history of your project</li>
+                    <li>Works offline</li>
+                    <li>Free and open source</li>
+                </ul>
+            </div>
+            <div class="comparison-card github">
+                <h3><span>🐙</span> GitHub</h3>
+                <ul>
+                    <li>Cloud hosting platform (website)</li>
+                    <li>Stores your Git repositories online</li>
+                    <li>Enables collaboration with others</li>
+                    <li>Provides project management tools</li>
+                    <li>Requires internet connection</li>
+                    <li>Free tier available, paid plans for teams</li>
+                </ul>
+            </div>
+        </div>
+    </section>
+    
+    <section id="concepts">
+        <div class="section-header">
+            <h2>Key Concepts</h2>
+            <p>Essential terms you need to know</p>
+        </div>
+        
+        <div class="concepts-grid">
+            <div class="concept-card">
+                <div class="concept-icon">📁</div>
+                <h3>Repository (Repo)</h3>
+                <p>A folder that Git tracks. Contains all your project files and the complete history of changes.</p>
+            </div>
+            <div class="concept-card">
+                <div class="concept-icon">📸</div>
+                <h3>Commit</h3>
+                <p>A snapshot of your project at a specific point in time. Like saving a checkpoint in a game.</p>
+            </div>
+            <div class="concept-card">
+                <div class="concept-icon">🌿</div>
+                <h3>Branch</h3>
+                <p>A parallel version of your code. Work on features without affecting the main codebase.</p>
+            </div>
+            <div class="concept-card">
+                <div class="concept-icon">🔀</div>
+                <h3>Merge</h3>
+                <p>Combining changes from one branch into another. Integrates your work with others.</p>
+            </div>
+            <div class="concept-card">
+                <div class="concept-icon">⬆️</div>
+                <h3>Push</h3>
+                <p>Upload your local commits to a remote repository (like GitHub).</p>
+            </div>
+            <div class="concept-card">
+                <div class="concept-icon">⬇️</div>
+                <h3>Pull</h3>
+                <p>Download changes from a remote repository to your local machine.</p>
+            </div>
+            <div class="concept-card">
+                <div class="concept-icon">📋</div>
+                <h3>Clone</h3>
+                <p>Create a local copy of a remote repository. Downloads the entire project history.</p>
+            </div>
+            <div class="concept-card">
+                <div class="concept-icon">🍴</div>
+                <h3>Fork</h3>
+                <p>Create your own copy of someone else's repository on GitHub. Used for contributing to projects.</p>
+            </div>
+        </div>
+    </section>
+    
+    <section>
+        <div class="section-header">
+            <h2>The Git Workflow</h2>
+            <p>How changes flow through Git</p>
+        </div>
+        
+        <div class="workflow-container">
+            <div class="workflow-step">
+                <div class="icon">📝</div>
+                <h4>Working Directory</h4>
+                <p>Edit your files</p>
+            </div>
+            <div class="workflow-step">
+                <div class="icon">📦</div>
+                <h4>Staging Area</h4>
+                <p>git add</p>
+            </div>
+            <div class="workflow-step">
+                <div class="icon">💾</div>
+                <h4>Local Repository</h4>
+                <p>git commit</p>
+            </div>
+            <div class="workflow-step">
+                <div class="icon">☁️</div>
+                <h4>Remote Repository</h4>
+                <p>git push</p>
+            </div>
+        </div>
+    </section>
+    
+    <section id="demo">
+        <div class="section-header">
+            <h2>Interactive Demo</h2>
+            <p>Watch Git commands in action</p>
+        </div>
+        
+        <div class="demo-section">
+            <div class="demo-header">
+                <h3>Git Terminal Simulator</h3>
+                <div class="demo-tabs">
+                    <button class="demo-tab active" data-demo="init">Initialize</button>
+                    <button class="demo-tab" data-demo="commit">Commit</button>
+                    <button class="demo-tab" data-demo="branch">Branch</button>
+                    <button class="demo-tab" data-demo="push">Push</button>
+                </div>
+            </div>
+            
+            <div class="terminal">
+                <div class="terminal-header">
+                    <span class="terminal-dot red"></span>
+                    <span class="terminal-dot yellow"></span>
+                    <span class="terminal-dot green"></span>
+                    <span class="terminal-title">Terminal — ~/my-project</span>
+                </div>
+                <div class="terminal-body" id="terminal-output">
+                    <!-- Commands will appear here -->
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <section id="commands">
+        <div class="section-header">
+            <h2>Essential Commands</h2>
+            <p>The commands you'll use every day</p>
+        </div>
+        
+        <div class="commands-grid">
+            <div class="command-item">
+                <code>git init</code>
+                <span>Initialize a new Git repository</span>
+            </div>
+            <div class="command-item">
+                <code>git clone [url]</code>
+                <span>Clone a repository from URL</span>
+            </div>
+            <div class="command-item">
+                <code>git status</code>
+                <span>Check the status of your files</span>
+            </div>
+            <div class="command-item">
+                <code>git add .</code>
+                <span>Stage all changes for commit</span>
+            </div>
+            <div class="command-item">
+                <code>git commit -m "msg"</code>
+                <span>Commit with a message</span>
+            </div>
+            <div class="command-item">
+                <code>git push</code>
+                <span>Push commits to remote</span>
+            </div>
+            <div class="command-item">
+                <code>git pull</code>
+                <span>Pull changes from remote</span>
+            </div>
+            <div class="command-item">
+                <code>git branch [name]</code>
+                <span>Create a new branch</span>
+            </div>
+            <div class="command-item">
+                <code>git checkout [branch]</code>
+                <span>Switch to a branch</span>
+            </div>
+            <div class="command-item">
+                <code>git merge [branch]</code>
+                <span>Merge a branch into current</span>
+            </div>
+            <div class="command-item">
+                <code>git log</code>
+                <span>View commit history</span>
+            </div>
+            <div class="command-item">
+                <code>git diff</code>
+                <span>View changes not yet staged</span>
+            </div>
+        </div>
+    </section>
+    
+    <section id="quiz">
+        <div class="section-header">
+            <h2>Test Your Knowledge</h2>
+            <p>See how much you've learned!</p>
+        </div>
+        
+        <div class="quiz-container">
+            <div class="quiz-question" data-question="1">
+                <h4>1. What is the main difference between Git and GitHub?</h4>
+                <div class="quiz-options">
+                    <div class="quiz-option" data-answer="wrong">They are the same thing</div>
+                    <div class="quiz-option" data-answer="correct">Git is local software, GitHub is a cloud platform</div>
+                    <div class="quiz-option" data-answer="wrong">GitHub is free, Git costs money</div>
+                    <div class="quiz-option" data-answer="wrong">Git only works on Windows</div>
+                </div>
+            </div>
+            
+            <div class="quiz-question" data-question="2">
+                <h4>2. What command saves your changes to the local repository?</h4>
+                <div class="quiz-options">
+                    <div class="quiz-option" data-answer="wrong">git push</div>
+                    <div class="quiz-option" data-answer="wrong">git save</div>
+                    <div class="quiz-option" data-answer="correct">git commit</div>
+                    <div class="quiz-option" data-answer="wrong">git add</div>
+                </div>
+            </div>
+            
+            <div class="quiz-question" data-question="3">
+                <h4>3. What does "git clone" do?</h4>
+                <div class="quiz-options">
+                    <div class="quiz-option" data-answer="wrong">Creates a new empty repository</div>
+                    <div class="quiz-option" data-answer="wrong">Deletes a repository</div>
+                    <div class="quiz-option" data-answer="correct">Creates a local copy of a remote repository</div>
+                    <div class="quiz-option" data-answer="wrong">Uploads files to GitHub</div>
+                </div>
+            </div>
+            
+            <div class="quiz-question" data-question="4">
+                <h4>4. Why would you create a branch?</h4>
+                <div class="quiz-options">
+                    <div class="quiz-option" data-answer="wrong">To delete old code</div>
+                    <div class="quiz-option" data-answer="correct">To work on a feature without affecting the main code</div>
+                    <div class="quiz-option" data-answer="wrong">To make the repository public</div>
+                    <div class="quiz-option" data-answer="wrong">To speed up Git</div>
+                </div>
+            </div>
+            
+            <div class="quiz-result" id="quiz-result">
+                <h3 id="result-title">Great job!</h3>
+                <p id="result-text">You got X out of 4 correct!</p>
+            </div>
+        </div>
+    </section>
+    
+    <footer>
+        <p>Built with ❤️ to help developers learn Git & GitHub</p>
+        <p style="margin-top: 8px;"><a href="https://github.com" target="_blank">Start using GitHub today →</a></p>
+    </footer>
+
+    <script>
+    (function() {
+        // =====================
+        // TERMINAL DEMO
+        // =====================
+        const demos = {
+            init: [
+                { type: 'command', text: 'git init' },
+                { type: 'output', text: 'Initialized empty Git repository in /Users/dev/my-project/.git/', class: 'success' },
+                { type: 'command', text: 'ls -la' },
+                { type: 'output', text: 'drwxr-xr-x  3 dev  staff   96 Dec 11 10:00 .\ndrwxr-xr-x  5 dev  staff  160 Dec 11 09:59 ..\ndrwxr-xr-x  9 dev  staff  288 Dec 11 10:00 .git' },
+                { type: 'command', text: 'git status' },
+                { type: 'output', text: 'On branch main\n\nNo commits yet\n\nnothing to commit (create/copy files and use "git add" to track)', class: 'success' }
+            ],
+            commit: [
+                { type: 'command', text: 'echo "# My Project" > README.md' },
+                { type: 'command', text: 'git status' },
+                { type: 'output', text: 'On branch main\n\nUntracked files:\n  (use "git add <file>..." to include in what will be committed)\n        README.md' },
+                { type: 'command', text: 'git add README.md' },
+                { type: 'command', text: 'git status' },
+                { type: 'output', text: 'On branch main\n\nChanges to be committed:\n  (use "git rm --cached <file>..." to unstage)\n        new file:   README.md', class: 'success' },
+                { type: 'command', text: 'git commit -m "Initial commit: Add README"' },
+                { type: 'output', text: '[main (root-commit) a1b2c3d] Initial commit: Add README\n 1 file changed, 1 insertion(+)\n create mode 100644 README.md', class: 'success' }
+            ],
+            branch: [
+                { type: 'command', text: 'git branch' },
+                { type: 'output', text: '* main', class: 'success' },
+                { type: 'command', text: 'git branch feature/new-feature' },
+                { type: 'command', text: 'git branch' },
+                { type: 'output', text: '  feature/new-feature\n* main', class: 'success' },
+                { type: 'command', text: 'git checkout feature/new-feature' },
+                { type: 'output', text: "Switched to branch 'feature/new-feature'", class: 'success' },
+                { type: 'command', text: 'git branch' },
+                { type: 'output', text: '* feature/new-feature\n  main', class: 'success' }
+            ],
+            push: [
+                { type: 'command', text: 'git remote add origin https://github.com/user/my-project.git' },
+                { type: 'command', text: 'git remote -v' },
+                { type: 'output', text: 'origin  https://github.com/user/my-project.git (fetch)\norigin  https://github.com/user/my-project.git (push)', class: 'success' },
+                { type: 'command', text: 'git push -u origin main' },
+                { type: 'output', text: 'Enumerating objects: 3, done.\nCounting objects: 100% (3/3), done.\nWriting objects: 100% (3/3), 234 bytes | 234.00 KiB/s, done.\nTotal 3 (delta 0), reused 0 (delta 0)\nTo https://github.com/user/my-project.git\n * [new branch]      main -> main\nBranch \'main\' set up to track remote branch \'main\' from \'origin\'.', class: 'success' }
+            ]
+        };
+        
+        let currentDemo = 'init';
+        
+        function runDemo(demo) {
+            const terminal = document.getElementById('terminal-output');
+            terminal.innerHTML = '';
+            
+            const steps = demos[demo];
+            let delay = 0;
+            
+            steps.forEach((step, index) => {
+                setTimeout(() => {
+                    if (step.type === 'command') {
+                        const line = document.createElement('div');
+                        line.className = 'command-line';
+                        line.style.animationDelay = '0s';
+                        line.innerHTML = `<span class="prompt">$</span><span class="command">${step.text}</span>`;
+                        terminal.appendChild(line);
+                    } else {
+                        const output = document.createElement('div');
+                        output.className = `output ${step.class || ''}`;
+                        output.style.whiteSpace = 'pre-wrap';
+                        output.textContent = step.text;
+                        terminal.appendChild(output);
+                    }
+                    terminal.scrollTop = terminal.scrollHeight;
+                }, delay);
+                
+                delay += step.type === 'command' ? 800 : 400;
+            });
+        }
+        
+        document.querySelectorAll('.demo-tab').forEach(tab => {
+            tab.addEventListener('click', () => {
+                document.querySelectorAll('.demo-tab').forEach(t => t.classList.remove('active'));
+                tab.classList.add('active');
+                currentDemo = tab.dataset.demo;
+                runDemo(currentDemo);
+            });
+        });
+        
+        // Initial demo
+        runDemo('init');
+        
+        // =====================
+        // QUIZ
+        // =====================
+        let score = 0;
+        let answered = 0;
+        const totalQuestions = 4;
+        
+        document.querySelectorAll('.quiz-option').forEach(option => {
+            option.addEventListener('click', () => {
+                const question = option.closest('.quiz-question');
+                if (question.classList.contains('answered')) return;
+                
+                question.classList.add('answered');
+                answered++;
+                
+                const isCorrect = option.dataset.answer === 'correct';
+                option.classList.add(isCorrect ? 'correct' : 'wrong');
+                
+                if (isCorrect) {
+                    score++;
+                } else {
+                    // Show correct answer
+                    question.querySelector('[data-answer="correct"]').classList.add('correct');
+                }
+                
+                if (answered === totalQuestions) {
+                    const result = document.getElementById('quiz-result');
+                    result.classList.add('show');
+                    document.getElementById('result-text').textContent = `You got ${score} out of ${totalQuestions} correct!`;
+                    
+                    if (score === totalQuestions) {
+                        document.getElementById('result-title').textContent = '🎉 Perfect Score!';
+                    } else if (score >= 3) {
+                        document.getElementById('result-title').textContent = '👏 Great Job!';
+                    } else {
+                        document.getElementById('result-title').textContent = '📚 Keep Learning!';
+                    }
+                }
+            });
+        });
+        
+        // =====================
+        // SMOOTH SCROLL
+        // =====================
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function(e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }
+            });
+        });
+        
+    })();
+    </script>
+</body>
+</html>
+

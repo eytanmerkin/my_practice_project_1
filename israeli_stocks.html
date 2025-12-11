@@ -1,0 +1,890 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>📈 Israeli Stock Tracker | Tel Aviv Stock Exchange</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;500;600;700&family=Space+Mono:wght@400;700&display=swap');
+        
+        :root {
+            --bg-primary: #0c1222;
+            --bg-secondary: #131b2e;
+            --bg-card: #1a2340;
+            --accent-blue: #0ea5e9;
+            --accent-green: #22c55e;
+            --accent-red: #ef4444;
+            --text-primary: #f1f5f9;
+            --text-secondary: #94a3b8;
+            --border-color: rgba(255,255,255,0.08);
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Heebo', sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            min-height: 100vh;
+        }
+        
+        .app {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 24px;
+        }
+        
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 32px;
+            padding-bottom: 24px;
+            border-bottom: 1px solid var(--border-color);
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        .logo-icon {
+            font-size: 2em;
+        }
+        
+        .logo h1 {
+            font-size: 1.5em;
+            font-weight: 600;
+            background: linear-gradient(135deg, #0ea5e9 0%, #22c55e 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .logo span {
+            font-size: 0.85em;
+            color: var(--text-secondary);
+            font-weight: 400;
+        }
+        
+        .market-status {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 16px;
+            background: var(--bg-card);
+            border-radius: 20px;
+            font-size: 0.85em;
+        }
+        
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--accent-green);
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+        
+        .market-status.closed .status-dot {
+            background: var(--accent-red);
+            animation: none;
+        }
+        
+        .dashboard {
+            display: grid;
+            grid-template-columns: 1fr 380px;
+            gap: 24px;
+        }
+        
+        .main-panel {
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+        }
+        
+        .indices-bar {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 16px;
+        }
+        
+        .index-card {
+            background: var(--bg-card);
+            border-radius: 12px;
+            padding: 20px;
+            border: 1px solid var(--border-color);
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        
+        .index-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(0,0,0,0.3);
+        }
+        
+        .index-name {
+            font-size: 0.85em;
+            color: var(--text-secondary);
+            margin-bottom: 8px;
+        }
+        
+        .index-value {
+            font-family: 'Space Mono', monospace;
+            font-size: 1.5em;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+        
+        .index-change {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-family: 'Space Mono', monospace;
+            font-size: 0.9em;
+        }
+        
+        .index-change.positive { color: var(--accent-green); }
+        .index-change.negative { color: var(--accent-red); }
+        
+        .chart-container {
+            background: var(--bg-card);
+            border-radius: 12px;
+            padding: 24px;
+            border: 1px solid var(--border-color);
+            flex: 1;
+        }
+        
+        .chart-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        
+        .chart-title {
+            font-size: 1.1em;
+            font-weight: 600;
+        }
+        
+        .time-filters {
+            display: flex;
+            gap: 8px;
+        }
+        
+        .time-btn {
+            padding: 6px 12px;
+            border: none;
+            background: transparent;
+            color: var(--text-secondary);
+            font-family: 'Heebo', sans-serif;
+            font-size: 0.85em;
+            cursor: pointer;
+            border-radius: 6px;
+            transition: all 0.2s;
+        }
+        
+        .time-btn:hover {
+            background: rgba(255,255,255,0.05);
+        }
+        
+        .time-btn.active {
+            background: var(--accent-blue);
+            color: white;
+        }
+        
+        .chart-area {
+            height: 300px;
+            position: relative;
+        }
+        
+        canvas {
+            width: 100% !important;
+            height: 100% !important;
+        }
+        
+        .sidebar {
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+        }
+        
+        .watchlist {
+            background: var(--bg-card);
+            border-radius: 12px;
+            border: 1px solid var(--border-color);
+            overflow: hidden;
+        }
+        
+        .watchlist-header {
+            padding: 16px 20px;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .watchlist-title {
+            font-weight: 600;
+        }
+        
+        .stock-list {
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        
+        .stock-item {
+            display: grid;
+            grid-template-columns: 1fr auto auto;
+            gap: 16px;
+            padding: 14px 20px;
+            border-bottom: 1px solid var(--border-color);
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        
+        .stock-item:hover {
+            background: rgba(255,255,255,0.03);
+        }
+        
+        .stock-item.selected {
+            background: rgba(14, 165, 233, 0.1);
+            border-left: 3px solid var(--accent-blue);
+        }
+        
+        .stock-item:last-child {
+            border-bottom: none;
+        }
+        
+        .stock-info h4 {
+            font-size: 0.95em;
+            font-weight: 600;
+            margin-bottom: 2px;
+        }
+        
+        .stock-info span {
+            font-size: 0.8em;
+            color: var(--text-secondary);
+        }
+        
+        .stock-price {
+            font-family: 'Space Mono', monospace;
+            font-weight: 600;
+            text-align: right;
+        }
+        
+        .stock-change {
+            font-family: 'Space Mono', monospace;
+            font-size: 0.85em;
+            padding: 4px 8px;
+            border-radius: 4px;
+            min-width: 70px;
+            text-align: center;
+        }
+        
+        .stock-change.positive {
+            background: rgba(34, 197, 94, 0.15);
+            color: var(--accent-green);
+        }
+        
+        .stock-change.negative {
+            background: rgba(239, 68, 68, 0.15);
+            color: var(--accent-red);
+        }
+        
+        .news-section {
+            background: var(--bg-card);
+            border-radius: 12px;
+            border: 1px solid var(--border-color);
+            padding: 20px;
+        }
+        
+        .news-title {
+            font-weight: 600;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .news-item {
+            padding: 12px 0;
+            border-bottom: 1px solid var(--border-color);
+        }
+        
+        .news-item:last-child {
+            border-bottom: none;
+            padding-bottom: 0;
+        }
+        
+        .news-item h5 {
+            font-size: 0.9em;
+            font-weight: 500;
+            margin-bottom: 4px;
+            line-height: 1.4;
+        }
+        
+        .news-item span {
+            font-size: 0.75em;
+            color: var(--text-secondary);
+        }
+        
+        .stock-details {
+            background: var(--bg-card);
+            border-radius: 12px;
+            border: 1px solid var(--border-color);
+            padding: 20px;
+        }
+        
+        .details-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 20px;
+        }
+        
+        .details-header h3 {
+            font-size: 1.2em;
+            margin-bottom: 4px;
+        }
+        
+        .details-header span {
+            color: var(--text-secondary);
+            font-size: 0.85em;
+        }
+        
+        .details-price {
+            text-align: right;
+        }
+        
+        .details-price .price {
+            font-family: 'Space Mono', monospace;
+            font-size: 1.5em;
+            font-weight: 700;
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+        }
+        
+        .stat-item {
+            background: var(--bg-secondary);
+            padding: 12px;
+            border-radius: 8px;
+        }
+        
+        .stat-item label {
+            font-size: 0.75em;
+            color: var(--text-secondary);
+            display: block;
+            margin-bottom: 4px;
+        }
+        
+        .stat-item value {
+            font-family: 'Space Mono', monospace;
+            font-weight: 600;
+        }
+        
+        .mini-chart {
+            height: 60px;
+            margin-top: 16px;
+        }
+        
+        @media (max-width: 1100px) {
+            .dashboard {
+                grid-template-columns: 1fr;
+            }
+            
+            .indices-bar {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        /* Scrollbar styling */
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+        
+        ::-webkit-scrollbar-track {
+            background: var(--bg-secondary);
+        }
+        
+        ::-webkit-scrollbar-thumb {
+            background: var(--text-secondary);
+            border-radius: 3px;
+        }
+    </style>
+</head>
+<body>
+    <div class="app">
+        <header>
+            <div class="logo">
+                <span class="logo-icon">📈</span>
+                <div>
+                    <h1>Israeli Stock Tracker</h1>
+                    <span>Tel Aviv Stock Exchange</span>
+                </div>
+            </div>
+            <div class="market-status" id="market-status">
+                <span class="status-dot"></span>
+                <span id="status-text">Market Open</span>
+            </div>
+        </header>
+        
+        <div class="dashboard">
+            <div class="main-panel">
+                <div class="indices-bar">
+                    <div class="index-card">
+                        <div class="index-name">TA-35</div>
+                        <div class="index-value" id="ta35-value">1,892.45</div>
+                        <div class="index-change positive" id="ta35-change">
+                            <span>▲</span>
+                            <span>+1.24%</span>
+                        </div>
+                    </div>
+                    <div class="index-card">
+                        <div class="index-name">TA-125</div>
+                        <div class="index-value" id="ta125-value">1,654.32</div>
+                        <div class="index-change positive" id="ta125-change">
+                            <span>▲</span>
+                            <span>+0.87%</span>
+                        </div>
+                    </div>
+                    <div class="index-card">
+                        <div class="index-name">TA-Banks</div>
+                        <div class="index-value" id="tabanks-value">2,341.18</div>
+                        <div class="index-change negative" id="tabanks-change">
+                            <span>▼</span>
+                            <span>-0.32%</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="chart-container">
+                    <div class="chart-header">
+                        <div class="chart-title" id="chart-title">TA-35 Index</div>
+                        <div class="time-filters">
+                            <button class="time-btn" data-period="1D">1D</button>
+                            <button class="time-btn active" data-period="1W">1W</button>
+                            <button class="time-btn" data-period="1M">1M</button>
+                            <button class="time-btn" data-period="3M">3M</button>
+                            <button class="time-btn" data-period="1Y">1Y</button>
+                        </div>
+                    </div>
+                    <div class="chart-area">
+                        <canvas id="main-chart"></canvas>
+                    </div>
+                </div>
+                
+                <div class="stock-details" id="stock-details">
+                    <div class="details-header">
+                        <div>
+                            <h3 id="detail-name">Bank Leumi</h3>
+                            <span id="detail-symbol">LUMI</span>
+                        </div>
+                        <div class="details-price">
+                            <div class="price" id="detail-price">₪32.45</div>
+                            <div class="index-change positive" id="detail-change">▲ +2.15%</div>
+                        </div>
+                    </div>
+                    <div class="stats-grid">
+                        <div class="stat-item">
+                            <label>Open</label>
+                            <value id="stat-open">₪31.80</value>
+                        </div>
+                        <div class="stat-item">
+                            <label>High</label>
+                            <value id="stat-high">₪32.90</value>
+                        </div>
+                        <div class="stat-item">
+                            <label>Low</label>
+                            <value id="stat-low">₪31.65</value>
+                        </div>
+                        <div class="stat-item">
+                            <label>Volume</label>
+                            <value id="stat-volume">2.4M</value>
+                        </div>
+                        <div class="stat-item">
+                            <label>Market Cap</label>
+                            <value id="stat-mcap">₪98.2B</value>
+                        </div>
+                        <div class="stat-item">
+                            <label>P/E Ratio</label>
+                            <value id="stat-pe">8.45</value>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="sidebar">
+                <div class="watchlist">
+                    <div class="watchlist-header">
+                        <span class="watchlist-title">📋 Watchlist</span>
+                        <span style="color: var(--text-secondary); font-size: 0.85em;">12 stocks</span>
+                    </div>
+                    <div class="stock-list" id="stock-list">
+                        <!-- Stocks will be inserted here -->
+                    </div>
+                </div>
+                
+                <div class="news-section">
+                    <div class="news-title">
+                        📰 Market News
+                    </div>
+                    <div id="news-list">
+                        <!-- News will be inserted here -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+    (function() {
+        // =====================
+        // ISRAELI STOCK DATA (Simulated)
+        // =====================
+        const stocks = [
+            { symbol: 'LUMI', name: 'Bank Leumi', price: 3245, sector: 'Banking', mcap: '98.2B', pe: 8.45 },
+            { symbol: 'POLI', name: 'Bank Hapoalim', price: 2987, sector: 'Banking', mcap: '89.5B', pe: 7.92 },
+            { symbol: 'DSCT', name: 'Discount Bank', price: 2156, sector: 'Banking', mcap: '45.3B', pe: 6.78 },
+            { symbol: 'TEVA', name: 'Teva Pharmaceutical', price: 5234, sector: 'Healthcare', mcap: '156.8B', pe: 12.34 },
+            { symbol: 'NICE', name: 'NICE Systems', price: 18945, sector: 'Technology', mcap: '234.5B', pe: 28.67 },
+            { symbol: 'CHKP', name: 'Check Point', price: 12456, sector: 'Technology', mcap: '178.2B', pe: 22.15 },
+            { symbol: 'BEZQ', name: 'Bezeq', price: 456, sector: 'Telecom', mcap: '12.8B', pe: 15.23 },
+            { symbol: 'ELCO', name: 'Elco Holdings', price: 8765, sector: 'Holdings', mcap: '34.5B', pe: 11.45 },
+            { symbol: 'ICL', name: 'ICL Group', price: 2345, sector: 'Chemicals', mcap: '67.8B', pe: 9.87 },
+            { symbol: 'AZRG', name: 'Azrieli Group', price: 7890, sector: 'Real Estate', mcap: '89.2B', pe: 14.56 },
+            { symbol: 'FIBI', name: 'First Intl Bank', price: 4567, sector: 'Banking', mcap: '56.7B', pe: 7.23 },
+            { symbol: 'MZTF', name: 'Mizrahi Tefahot', price: 3678, sector: 'Banking', mcap: '72.3B', pe: 8.12 }
+        ];
+        
+        const news = [
+            { title: 'Bank of Israel holds interest rate steady at 4.5%', time: '2 hours ago' },
+            { title: 'Tech sector leads gains on TA-35 index', time: '4 hours ago' },
+            { title: 'Teva announces new partnership in Europe', time: '6 hours ago' },
+            { title: 'Foreign investment in TASE reaches record high', time: '8 hours ago' }
+        ];
+        
+        // State
+        let selectedStock = stocks[0];
+        let stockChanges = {};
+        let chartData = [];
+        let selectedPeriod = '1W';
+        
+        // Initialize stock changes
+        stocks.forEach(stock => {
+            stockChanges[stock.symbol] = (Math.random() - 0.45) * 8;
+        });
+        
+        // =====================
+        // MARKET STATUS
+        // =====================
+        function updateMarketStatus() {
+            const now = new Date();
+            const day = now.getDay();
+            const hour = now.getHours();
+            const minute = now.getMinutes();
+            const israelTime = hour; // Simplified - assumes local time matches Israel
+            
+            // TASE is open Sunday-Thursday, 9:00-17:30 Israel time
+            const isWeekday = day >= 0 && day <= 4; // Sunday = 0
+            const isMarketHours = israelTime >= 9 && (israelTime < 17 || (israelTime === 17 && minute <= 30));
+            const isOpen = isWeekday && isMarketHours;
+            
+            const statusEl = document.getElementById('market-status');
+            const textEl = document.getElementById('status-text');
+            
+            if (isOpen) {
+                statusEl.classList.remove('closed');
+                textEl.textContent = 'Market Open';
+            } else {
+                statusEl.classList.add('closed');
+                textEl.textContent = 'Market Closed';
+            }
+        }
+        
+        // =====================
+        // RENDER FUNCTIONS
+        // =====================
+        function renderStockList() {
+            const container = document.getElementById('stock-list');
+            container.innerHTML = stocks.map(stock => {
+                const change = stockChanges[stock.symbol];
+                const changeClass = change >= 0 ? 'positive' : 'negative';
+                const arrow = change >= 0 ? '▲' : '▼';
+                const isSelected = stock.symbol === selectedStock.symbol;
+                
+                return `
+                    <div class="stock-item ${isSelected ? 'selected' : ''}" data-symbol="${stock.symbol}">
+                        <div class="stock-info">
+                            <h4>${stock.name}</h4>
+                            <span>${stock.symbol}</span>
+                        </div>
+                        <div class="stock-price">₪${(stock.price / 100).toFixed(2)}</div>
+                        <div class="stock-change ${changeClass}">
+                            ${arrow} ${Math.abs(change).toFixed(2)}%
+                        </div>
+                    </div>
+                `;
+            }).join('');
+            
+            // Add click handlers
+            container.querySelectorAll('.stock-item').forEach(item => {
+                item.addEventListener('click', () => {
+                    const symbol = item.dataset.symbol;
+                    selectedStock = stocks.find(s => s.symbol === symbol);
+                    renderStockList();
+                    updateStockDetails();
+                    generateChartData();
+                    drawChart();
+                });
+            });
+        }
+        
+        function renderNews() {
+            const container = document.getElementById('news-list');
+            container.innerHTML = news.map(item => `
+                <div class="news-item">
+                    <h5>${item.title}</h5>
+                    <span>${item.time}</span>
+                </div>
+            `).join('');
+        }
+        
+        function updateStockDetails() {
+            const change = stockChanges[selectedStock.symbol];
+            const changeClass = change >= 0 ? 'positive' : 'negative';
+            const arrow = change >= 0 ? '▲' : '▼';
+            const price = selectedStock.price / 100;
+            
+            document.getElementById('detail-name').textContent = selectedStock.name;
+            document.getElementById('detail-symbol').textContent = selectedStock.symbol;
+            document.getElementById('detail-price').textContent = `₪${price.toFixed(2)}`;
+            document.getElementById('detail-change').textContent = `${arrow} ${Math.abs(change).toFixed(2)}%`;
+            document.getElementById('detail-change').className = `index-change ${changeClass}`;
+            
+            const openPrice = price * (1 - change/100);
+            document.getElementById('stat-open').textContent = `₪${openPrice.toFixed(2)}`;
+            document.getElementById('stat-high').textContent = `₪${(price * 1.02).toFixed(2)}`;
+            document.getElementById('stat-low').textContent = `₪${(price * 0.98).toFixed(2)}`;
+            document.getElementById('stat-volume').textContent = `${(Math.random() * 5 + 0.5).toFixed(1)}M`;
+            document.getElementById('stat-mcap').textContent = `₪${selectedStock.mcap}`;
+            document.getElementById('stat-pe').textContent = selectedStock.pe.toFixed(2);
+            
+            document.getElementById('chart-title').textContent = selectedStock.name;
+        }
+        
+        function updateIndices() {
+            // Simulate index changes
+            const ta35Change = (Math.random() - 0.4) * 3;
+            const ta125Change = (Math.random() - 0.4) * 2.5;
+            const taBanksChange = (Math.random() - 0.5) * 2;
+            
+            updateIndex('ta35', 1892.45, ta35Change);
+            updateIndex('ta125', 1654.32, ta125Change);
+            updateIndex('tabanks', 2341.18, taBanksChange);
+        }
+        
+        function updateIndex(id, baseValue, change) {
+            const value = baseValue * (1 + change/100);
+            const changeClass = change >= 0 ? 'positive' : 'negative';
+            const arrow = change >= 0 ? '▲' : '▼';
+            
+            document.getElementById(`${id}-value`).textContent = value.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+            document.getElementById(`${id}-change`).innerHTML = `<span>${arrow}</span><span>${change >= 0 ? '+' : ''}${change.toFixed(2)}%</span>`;
+            document.getElementById(`${id}-change`).className = `index-change ${changeClass}`;
+        }
+        
+        // =====================
+        // CHART
+        // =====================
+        function generateChartData() {
+            const periods = { '1D': 24, '1W': 7, '1M': 30, '3M': 90, '1Y': 365 };
+            const points = periods[selectedPeriod] || 7;
+            
+            chartData = [];
+            let price = selectedStock.price / 100;
+            
+            for (let i = points; i >= 0; i--) {
+                const volatility = selectedPeriod === '1D' ? 0.002 : 0.015;
+                price = price * (1 + (Math.random() - 0.48) * volatility);
+                chartData.push({
+                    time: i,
+                    price: price
+                });
+            }
+        }
+        
+        function drawChart() {
+            const canvas = document.getElementById('main-chart');
+            const ctx = canvas.getContext('2d');
+            const rect = canvas.parentElement.getBoundingClientRect();
+            
+            canvas.width = rect.width * 2;
+            canvas.height = rect.height * 2;
+            ctx.scale(2, 2);
+            
+            const width = rect.width;
+            const height = rect.height;
+            const padding = { top: 20, right: 20, bottom: 30, left: 60 };
+            
+            // Clear
+            ctx.clearRect(0, 0, width, height);
+            
+            if (chartData.length < 2) return;
+            
+            // Calculate bounds
+            const prices = chartData.map(d => d.price);
+            const minPrice = Math.min(...prices) * 0.995;
+            const maxPrice = Math.max(...prices) * 1.005;
+            
+            const chartWidth = width - padding.left - padding.right;
+            const chartHeight = height - padding.top - padding.bottom;
+            
+            // Scale functions
+            const xScale = (i) => padding.left + (i / (chartData.length - 1)) * chartWidth;
+            const yScale = (p) => padding.top + chartHeight - ((p - minPrice) / (maxPrice - minPrice)) * chartHeight;
+            
+            // Draw grid
+            ctx.strokeStyle = 'rgba(255,255,255,0.05)';
+            ctx.lineWidth = 1;
+            
+            for (let i = 0; i <= 5; i++) {
+                const y = padding.top + (i / 5) * chartHeight;
+                ctx.beginPath();
+                ctx.moveTo(padding.left, y);
+                ctx.lineTo(width - padding.right, y);
+                ctx.stroke();
+                
+                // Price labels
+                const price = maxPrice - (i / 5) * (maxPrice - minPrice);
+                ctx.fillStyle = '#64748b';
+                ctx.font = '11px Space Mono';
+                ctx.textAlign = 'right';
+                ctx.fillText(`₪${price.toFixed(2)}`, padding.left - 8, y + 4);
+            }
+            
+            // Draw gradient fill
+            const gradient = ctx.createLinearGradient(0, padding.top, 0, height - padding.bottom);
+            const isPositive = chartData[chartData.length - 1].price >= chartData[0].price;
+            
+            if (isPositive) {
+                gradient.addColorStop(0, 'rgba(34, 197, 94, 0.3)');
+                gradient.addColorStop(1, 'rgba(34, 197, 94, 0)');
+            } else {
+                gradient.addColorStop(0, 'rgba(239, 68, 68, 0.3)');
+                gradient.addColorStop(1, 'rgba(239, 68, 68, 0)');
+            }
+            
+            ctx.beginPath();
+            ctx.moveTo(xScale(0), height - padding.bottom);
+            chartData.forEach((d, i) => {
+                ctx.lineTo(xScale(i), yScale(d.price));
+            });
+            ctx.lineTo(xScale(chartData.length - 1), height - padding.bottom);
+            ctx.closePath();
+            ctx.fillStyle = gradient;
+            ctx.fill();
+            
+            // Draw line
+            ctx.beginPath();
+            ctx.strokeStyle = isPositive ? '#22c55e' : '#ef4444';
+            ctx.lineWidth = 2;
+            chartData.forEach((d, i) => {
+                if (i === 0) {
+                    ctx.moveTo(xScale(i), yScale(d.price));
+                } else {
+                    ctx.lineTo(xScale(i), yScale(d.price));
+                }
+            });
+            ctx.stroke();
+            
+            // Draw current price dot
+            const lastPoint = chartData[chartData.length - 1];
+            ctx.beginPath();
+            ctx.arc(xScale(chartData.length - 1), yScale(lastPoint.price), 5, 0, Math.PI * 2);
+            ctx.fillStyle = isPositive ? '#22c55e' : '#ef4444';
+            ctx.fill();
+            ctx.strokeStyle = '#fff';
+            ctx.lineWidth = 2;
+            ctx.stroke();
+        }
+        
+        // =====================
+        // EVENT LISTENERS
+        // =====================
+        document.querySelectorAll('.time-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.querySelectorAll('.time-btn').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                selectedPeriod = btn.dataset.period;
+                generateChartData();
+                drawChart();
+            });
+        });
+        
+        window.addEventListener('resize', drawChart);
+        
+        // =====================
+        // LIVE UPDATES (Simulated)
+        // =====================
+        function simulateLiveUpdates() {
+            // Update stock prices
+            stocks.forEach(stock => {
+                const change = (Math.random() - 0.5) * 0.5;
+                stockChanges[stock.symbol] += change;
+                stockChanges[stock.symbol] = Math.max(-10, Math.min(10, stockChanges[stock.symbol]));
+            });
+            
+            renderStockList();
+            updateStockDetails();
+            updateIndices();
+            
+            // Update chart occasionally
+            if (Math.random() > 0.7) {
+                const lastPrice = chartData[chartData.length - 1].price;
+                chartData.push({
+                    time: chartData.length,
+                    price: lastPrice * (1 + (Math.random() - 0.48) * 0.005)
+                });
+                if (chartData.length > 100) chartData.shift();
+                drawChart();
+            }
+        }
+        
+        // =====================
+        // INITIALIZE
+        // =====================
+        function init() {
+            updateMarketStatus();
+            renderStockList();
+            renderNews();
+            updateStockDetails();
+            updateIndices();
+            generateChartData();
+            
+            // Wait for DOM to settle, then draw chart
+            setTimeout(drawChart, 100);
+            
+            // Start live updates
+            setInterval(simulateLiveUpdates, 3000);
+            setInterval(updateMarketStatus, 60000);
+        }
+        
+        init();
+    })();
+    </script>
+</body>
+</html>
+

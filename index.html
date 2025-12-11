@@ -1,0 +1,430 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interactive Visualizations | Portfolio</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
+        
+        :root {
+            --bg-primary: #050508;
+            --bg-secondary: #0a0a12;
+            --bg-card: #10101a;
+            --accent-1: #6366f1;
+            --accent-2: #8b5cf6;
+            --accent-3: #ec4899;
+            --accent-4: #10b981;
+            --text-primary: #f8fafc;
+            --text-secondary: #94a3b8;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Space Grotesk', sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+        
+        /* Animated background */
+        .bg-gradient {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: 
+                radial-gradient(ellipse at 20% 20%, rgba(99, 102, 241, 0.15) 0%, transparent 50%),
+                radial-gradient(ellipse at 80% 80%, rgba(139, 92, 246, 0.1) 0%, transparent 50%),
+                radial-gradient(ellipse at 50% 50%, rgba(236, 72, 153, 0.05) 0%, transparent 70%);
+            z-index: -1;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 60px 24px;
+        }
+        
+        /* Header */
+        header {
+            text-align: center;
+            margin-bottom: 80px;
+        }
+        
+        .logo {
+            display: inline-flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 32px;
+            padding: 12px 24px;
+            background: rgba(255,255,255,0.05);
+            border-radius: 50px;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+        
+        .logo-icon {
+            font-size: 1.5em;
+        }
+        
+        .logo span {
+            font-weight: 500;
+            font-size: 0.95em;
+            letter-spacing: 1px;
+        }
+        
+        header h1 {
+            font-size: 4em;
+            font-weight: 700;
+            line-height: 1.1;
+            margin-bottom: 24px;
+            background: linear-gradient(135deg, var(--accent-1) 0%, var(--accent-2) 50%, var(--accent-3) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        header p {
+            font-size: 1.3em;
+            color: var(--text-secondary);
+            max-width: 600px;
+            margin: 0 auto;
+            line-height: 1.6;
+        }
+        
+        /* Projects Grid */
+        .projects-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 24px;
+        }
+        
+        .project-card {
+            position: relative;
+            background: var(--bg-card);
+            border-radius: 20px;
+            overflow: hidden;
+            border: 1px solid rgba(255,255,255,0.08);
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            cursor: pointer;
+            text-decoration: none;
+            color: inherit;
+        }
+        
+        .project-card:hover {
+            transform: translateY(-8px);
+            border-color: rgba(255,255,255,0.2);
+            box-shadow: 
+                0 20px 40px rgba(0,0,0,0.4),
+                0 0 0 1px rgba(255,255,255,0.1);
+        }
+        
+        .card-preview {
+            height: 220px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .card-preview::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(180deg, transparent 0%, var(--bg-card) 100%);
+            z-index: 1;
+        }
+        
+        .preview-visual {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 5em;
+            opacity: 0.8;
+        }
+        
+        /* Card specific backgrounds */
+        .project-card.protein .card-preview {
+            background: linear-gradient(135deg, #065f46 0%, #10b981 100%);
+        }
+        
+        .project-card.stocks .card-preview {
+            background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%);
+        }
+        
+        .project-card.ml .card-preview {
+            background: linear-gradient(135deg, #581c87 0%, #a855f7 100%);
+        }
+        
+        .project-card.git .card-preview {
+            background: linear-gradient(135deg, #7f1d1d 0%, #f05033 100%);
+        }
+        
+        .card-content {
+            padding: 28px;
+        }
+        
+        .card-tag {
+            display: inline-block;
+            padding: 6px 12px;
+            background: rgba(255,255,255,0.08);
+            border-radius: 6px;
+            font-size: 0.75em;
+            font-weight: 500;
+            letter-spacing: 0.5px;
+            margin-bottom: 16px;
+            color: var(--text-secondary);
+        }
+        
+        .card-content h2 {
+            font-size: 1.5em;
+            font-weight: 600;
+            margin-bottom: 12px;
+        }
+        
+        .card-content p {
+            color: var(--text-secondary);
+            font-size: 0.95em;
+            line-height: 1.6;
+            margin-bottom: 20px;
+        }
+        
+        .card-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .tech-tags {
+            display: flex;
+            gap: 8px;
+        }
+        
+        .tech-tag {
+            padding: 4px 10px;
+            background: rgba(255,255,255,0.05);
+            border-radius: 4px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.75em;
+            color: var(--text-secondary);
+        }
+        
+        .view-btn {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: var(--accent-1);
+            font-weight: 500;
+            font-size: 0.9em;
+        }
+        
+        .view-btn svg {
+            transition: transform 0.3s;
+        }
+        
+        .project-card:hover .view-btn svg {
+            transform: translateX(4px);
+        }
+        
+        /* Footer */
+        footer {
+            margin-top: 80px;
+            text-align: center;
+            padding: 40px 24px;
+            border-top: 1px solid rgba(255,255,255,0.08);
+        }
+        
+        footer p {
+            color: var(--text-secondary);
+            font-size: 0.9em;
+        }
+        
+        footer a {
+            color: var(--accent-1);
+            text-decoration: none;
+        }
+        
+        footer a:hover {
+            text-decoration: underline;
+        }
+        
+        .github-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            margin-top: 16px;
+            padding: 12px 24px;
+            background: rgba(255,255,255,0.05);
+            border-radius: 8px;
+            color: var(--text-primary);
+            text-decoration: none;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+        
+        .github-link:hover {
+            background: rgba(255,255,255,0.1);
+            text-decoration: none;
+        }
+        
+        /* Responsive */
+        @media (max-width: 900px) {
+            .projects-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            header h1 {
+                font-size: 2.5em;
+            }
+        }
+        
+        /* Animations */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .project-card {
+            animation: fadeInUp 0.6s ease-out forwards;
+            opacity: 0;
+        }
+        
+        .project-card:nth-child(1) { animation-delay: 0.1s; }
+        .project-card:nth-child(2) { animation-delay: 0.2s; }
+        .project-card:nth-child(3) { animation-delay: 0.3s; }
+        .project-card:nth-child(4) { animation-delay: 0.4s; }
+    </style>
+</head>
+<body>
+    <div class="bg-gradient"></div>
+    
+    <div class="container">
+        <header>
+            <div class="logo">
+                <span class="logo-icon">✨</span>
+                <span>INTERACTIVE PROJECTS</span>
+            </div>
+            <h1>Learning Through<br>Visualization</h1>
+            <p>A collection of interactive web applications for exploring complex topics in science, technology, and finance</p>
+        </header>
+        
+        <div class="projects-grid">
+            <a href="protein_folding.html" class="project-card protein">
+                <div class="card-preview">
+                    <div class="preview-visual">🧬</div>
+                </div>
+                <div class="card-content">
+                    <span class="card-tag">BIOLOGY</span>
+                    <h2>Protein Folding Visualization</h2>
+                    <p>Explore 3D protein structures and watch the folding process from linear chains to complex conformations with interactive controls.</p>
+                    <div class="card-footer">
+                        <div class="tech-tags">
+                            <span class="tech-tag">Three.js</span>
+                            <span class="tech-tag">WebGL</span>
+                        </div>
+                        <span class="view-btn">
+                            View Project
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M5 12h14M12 5l7 7-7 7"/>
+                            </svg>
+                        </span>
+                    </div>
+                </div>
+            </a>
+            
+            <a href="israeli_stocks.html" class="project-card stocks">
+                <div class="card-preview">
+                    <div class="preview-visual">📈</div>
+                </div>
+                <div class="card-content">
+                    <span class="card-tag">FINANCE</span>
+                    <h2>Israeli Stock Tracker</h2>
+                    <p>Track Tel Aviv Stock Exchange indices and stocks with real-time charts, watchlists, and market news in a professional dashboard.</p>
+                    <div class="card-footer">
+                        <div class="tech-tags">
+                            <span class="tech-tag">Canvas</span>
+                            <span class="tech-tag">Charts</span>
+                        </div>
+                        <span class="view-btn">
+                            View Project
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M5 12h14M12 5l7 7-7 7"/>
+                            </svg>
+                        </span>
+                    </div>
+                </div>
+            </a>
+            
+            <a href="machine_learning.html" class="project-card ml">
+                <div class="card-preview">
+                    <div class="preview-visual">🤖</div>
+                </div>
+                <div class="card-content">
+                    <span class="card-tag">ARTIFICIAL INTELLIGENCE</span>
+                    <h2>Machine Learning Types</h2>
+                    <p>Interactive guide to different types of machine learning with animated demonstrations of supervised, unsupervised, and reinforcement learning.</p>
+                    <div class="card-footer">
+                        <div class="tech-tags">
+                            <span class="tech-tag">Canvas</span>
+                            <span class="tech-tag">Animation</span>
+                        </div>
+                        <span class="view-btn">
+                            View Project
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M5 12h14M12 5l7 7-7 7"/>
+                            </svg>
+                        </span>
+                    </div>
+                </div>
+            </a>
+            
+            <a href="git_guide.html" class="project-card git">
+                <div class="card-preview">
+                    <div class="preview-visual">🔀</div>
+                </div>
+                <div class="card-content">
+                    <span class="card-tag">DEVELOPER TOOLS</span>
+                    <h2>Git & GitHub Guide</h2>
+                    <p>Learn version control with an interactive terminal simulator, comprehensive command reference, and knowledge quiz.</p>
+                    <div class="card-footer">
+                        <div class="tech-tags">
+                            <span class="tech-tag">Interactive</span>
+                            <span class="tech-tag">Tutorial</span>
+                        </div>
+                        <span class="view-btn">
+                            View Project
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M5 12h14M12 5l7 7-7 7"/>
+                            </svg>
+                        </span>
+                    </div>
+                </div>
+            </a>
+        </div>
+        
+        <footer>
+            <p>Built with HTML, CSS, and JavaScript — No frameworks required</p>
+            <a href="https://github.com/eytanmerkin/my_practice_project_1" class="github-link" target="_blank">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/>
+                </svg>
+                View on GitHub
+            </a>
+        </footer>
+    </div>
+</body>
+</html>
+
