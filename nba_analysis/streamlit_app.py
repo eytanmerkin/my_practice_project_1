@@ -1,6 +1,9 @@
 """
 Interactive NBA Point Differential Predictor - Streamlit App
 Run with: streamlit run streamlit_app.py
+
+This app uses pre-collected historical data from nba_team_seasons_processed.csv
+which contains 832 team-seasons from 1996-97 to 2023-24.
 """
 
 import streamlit as st
@@ -10,9 +13,7 @@ import plotly.graph_objects as go
 import plotly.express as px
 from sklearn.linear_model import LinearRegression
 from sklearn.metrics import r2_score, mean_squared_error
-from nba_api.stats.endpoints import leaguedashteamstats
-from nba_api.stats.static import teams
-import time
+import os
 
 
 # Page configuration
@@ -24,60 +25,34 @@ st.set_page_config(
 )
 
 
-@st.cache_data(ttl=3600)
-def fetch_team_season_data(num_seasons=30):
-    """Fetch NBA team season data with caching (NBA teams only)."""
-    # Get NBA team IDs to filter results
-    nba_teams = teams.get_teams()
-    nba_team_ids = set([team['id'] for team in nba_teams])
+@st.cache_data
+def load_historical_data():
+    """Load pre-collected NBA team season data from CSV file.
     
-    # Default to 30 seasons for better statistical power
-    # More seasons = more data points = more accurate model
-    current_year = 2024
-    seasons = [f"{year}-{str(year+1)[-2:]}" for year in range(current_year-num_seasons, current_year)]
+    This data contains 832 team-seasons from 1996-97 to 2023-24,
+    pre-processed with point differential and win percentage calculations.
+    """
+    # Get the directory where this script is located
+    script_dir = os.path.dirname(os.path.abspath(__file__))
+    csv_path = os.path.join(script_dir, 'nba_team_seasons_processed.csv')
     
-    all_data = []
-    progress_bar = st.progress(0)
-    status_text = st.empty()
-    
-    for idx, season in enumerate(seasons):
-        try:
-            status_text.text(f"Fetching {season}...")
-            
-            team_stats = leaguedashteamstats.LeagueDashTeamStats(
-                season=season,
-                season_type_all_star='Regular Season',
-                per_mode_detailed='Totals'
-            )
-            
-            df = team_stats.get_data_frames()[0]
-            
-            # Filter to only NBA teams
-            df = df[df['TEAM_ID'].isin(nba_team_ids)].copy()
-            
-            # Filter out teams with too few games (likely data errors or partial seasons)
-            # Require at least 20 games (to handle lockout seasons like 2011-12, 1998-99)
-            df = df[df['GP'] >= 20].copy()
-            
-            if len(df) > 0:
-                df['SEASON'] = season
-                all_data.append(df)
-            
-            progress_bar.progress((idx + 1) / len(seasons))
-            time.sleep(0.6)
-            
-        except Exception as e:
-            st.warning(f"Error fetching {season}: {e}")
-            continue
-    
-    progress_bar.empty()
-    status_text.empty()
-    
-    if not all_data:
-        st.error("Failed to fetch data. Please try again.")
+    if not os.path.exists(csv_path):
+        st.error(f"Data file not found: {csv_path}")
+        st.info("Please ensure 'nba_team_seasons_processed.csv' exists in the nba_analysis folder.")
         return None
     
-    return pd.concat(all_data, ignore_index=True)
+    df = pd.read_csv(csv_path)
+    st.success(f"✅ Loaded {len(df)} team-seasons from historical data (1996-2024)")
+    return df
+
+
+def fetch_team_season_data(num_seasons=30):
+    """Legacy function - now loads from CSV instead of fetching live data.
+    
+    The num_seasons parameter is kept for interface compatibility but is ignored
+    since we use the full pre-collected dataset.
+    """
+    return load_historical_data()
 
 
 def calculate_metrics(df):
@@ -230,30 +205,40 @@ def main():
     # Sidebar
     with st.sidebar:
         st.header("⚙️ Settings")
-        num_seasons = st.slider("Number of seasons to analyze", 10, 40, 30, 
-                                help="More seasons = more data = better model accuracy. Recommended: 25-30+ seasons")
         games_in_season = st.number_input("Games in season", 1, 82, 82)
         
         st.markdown("---")
         st.markdown("### 📊 About")
         st.markdown("""
-        This tool uses historical NBA data to predict expected wins based on 
-        point differential. Point differential is one of the strongest predictors 
-        of team success.
+        This tool uses historical NBA data (832 team-seasons from 1996-2024) 
+        to predict expected wins based on point differential.
+        
+        Point differential is one of the strongest predictors of team success,
+        explaining ~94% of the variance in winning percentage.
         """)
         
-        if st.button("🔄 Refresh Data", help="Fetch latest NBA data"):
+        st.markdown("---")
+        st.markdown("### 📁 Data Source")
+        st.markdown("""
+        Using pre-collected data from `nba_team_seasons_processed.csv` for 
+        faster loading and reliability.
+        """)
+        
+        if st.button("🔄 Reload Data", help="Reload data from CSV"):
             st.cache_data.clear()
             st.rerun()
     
     # Load data
     with st.spinner("Loading NBA data..."):
-        df = fetch_team_season_data(num_seasons)
+        df = fetch_team_season_data()
         
         if df is None:
             st.stop()
         
+        # Data is already processed in CSV, but ensure columns exist
+        if 'POINT_DIFF_PER_GAME' not in df.columns:
         df = calculate_metrics(df)
+        
         model, r2, rmse = train_model(df)
     
     # Display model performance
