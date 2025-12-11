@@ -10,7 +10,7 @@ import seaborn as sns
 from sklearn.linear_model import LinearRegression
 from sklearn.metrics import r2_score, mean_squared_error
 from nba_api.stats.endpoints import leaguegamefinder, leaguedashteamstats
-from nba_api.stats.static import teams
+# Note: teams.get_teams() only returns current team IDs, which excludes historical teams
 import time
 from typing import Tuple, Dict, List
 import warnings
@@ -34,15 +34,12 @@ def fetch_team_season_data(seasons: List[str] = None, num_seasons: int = 30) -> 
     Returns:
         DataFrame with team season statistics (NBA teams only)
     """
-    # Get NBA team IDs to filter results
-    nba_teams = teams.get_teams()
-    nba_team_ids = set([team['id'] for team in nba_teams])
-    
     if seasons is None:
-        # Default to last 30 seasons (1994-95 to 2023-24)
-        # NBA API has reliable data back to ~1980, but 30 seasons gives ~900 data points
-        current_year = 2024
-        seasons = [f"{year}-{str(year+1)[-2:]}" for year in range(current_year-num_seasons, current_year)]
+        # Start from 1996-97 (earliest reliable data in NBA API for this endpoint)
+        # to 2024-25 current season
+        start_year = 1996
+        end_year = 2025
+        seasons = [f"{year}-{str(year+1)[-2:]}" for year in range(start_year, end_year)]
     
     all_data = []
     
@@ -61,8 +58,10 @@ def fetch_team_season_data(seasons: List[str] = None, num_seasons: int = 30) -> 
             
             df = team_stats.get_data_frames()[0]
             
-            # Filter to only NBA teams
-            df = df[df['TEAM_ID'].isin(nba_team_ids)].copy()
+            # Filter to NBA teams only using team ID range
+            # NBA team IDs are in the 1610612700-1610612799 range
+            # This excludes G-League (12XX), WNBA (161161XXXX), and other leagues
+            df = df[df['TEAM_ID'].between(1610612700, 1610612799)].copy()
             
             # Filter out teams with too few games (likely data errors or partial seasons)
             # Require at least 20 games (to handle lockout seasons like 2011-12, 1998-99)
@@ -73,7 +72,7 @@ def fetch_team_season_data(seasons: List[str] = None, num_seasons: int = 30) -> 
                 all_data.append(df)
                 print(f"✓ ({len(df)} NBA teams)")
             else:
-                print(f"⚠ ({len(df)} NBA teams after filtering)")
+                print(f"⚠ (no data or incomplete season)")
             
             # Rate limiting to avoid API throttling
             time.sleep(0.6)
@@ -350,14 +349,13 @@ def main():
     print("NBA POINT DIFFERENTIAL vs WINNING PERCENTAGE ANALYSIS")
     print("="*60 + "\n")
     
-    # Fetch data - using 30 seasons for better statistical power
-    # You can adjust this: more seasons = more data = better model
-    # NBA API has data back to ~1980, so you can go up to ~45 seasons if desired
-    # Example: df = fetch_team_season_data(num_seasons=40) for 40 seasons
+    # Fetch data - using all available seasons (1996-2025) for maximum statistical power
+    # This gives us ~850+ team-seasons for robust analysis
     print("Step 1: Fetching NBA season data...")
-    print("Note: Fetching 30 seasons for robust analysis (~900 team-seasons)")
-    print("      Adjust num_seasons parameter to fetch more historical data")
-    df = fetch_team_season_data(num_seasons=30)
+    print("Note: Fetching seasons from 1996-2025 (~850+ team-seasons)")
+    print("      NBA API doesn't have reliable data before 1996-97 for this endpoint")
+    print("      This may take several minutes due to API rate limiting...")
+    df = fetch_team_season_data()
     
     # Calculate metrics
     print("\nStep 2: Calculating metrics...")
